@@ -1,246 +1,89 @@
-# Implementation Tasks: [FEATURE-NAME]
+# Implementation Tasks Template (Atomic Checklist)
 
-**Feature ID**: [PROJ-XXX]  
-**Created**: [YYYY-MM-DD]  
-**Owner**: Architect Agent  
+**Feature ID**: [PROJ-XXX]
+**Created**: [YYYY-MM-DD]
+**Owner**: Architect Agent
 **Status**: Draft | In Review | Approved | In Progress | Complete
 
----
-
-## Task Overview
-
-### Summary
-
-[Brief description of the implementation plan]
-
-### Estimation
-
-- **Total Effort**: [X] hours/days
-- **Developer Count**: [N] developers
-- **Timeline**: [Start Date] to [End Date]
-
-### Dependencies Graph
-
-```
-Task 1 → Task 2 → Task 5
-      ↘ Task 3 → Task 6
-Task 4 ────────↗
-```
+Short purpose: use small, atomic checklist steps for implementation. Each checklist item should represent a single developer action (15–240 minutes). This template shows the minimal fields required and an example task layout.
 
 ---
 
-## Phase 1: Foundation
+## Implementation Steps Format (Atomic Checklist)
 
-### TASK-001: [Task Title]
+- Use a markdown checklist for each task's implementation steps. Keep steps short and atomic.
+- Agents MUST request explicit human approval before toggling any `- [ ]` to `- [x]`. When they do toggle items they must report which items were changed, why, and include any artifacts (logs, diffs, screenshots) as applicable.
+- Example:
+
+- [ ] Create model `WeatherCache` in `backend/api/models.py`
+- [ ] Run `python manage.py makemigrations` and commit migration
+- [ ] Run `python manage.py migrate` and verify table exists
+
+---
+
+## Minimal Task Block (copy for each TASK-###)
+
+### TASK-###: [Short title]
 
 **Status**: Not Started | In Progress | Blocked | Complete
 
 **Priority**: High | Medium | Low  
-**Effort**: [X] hours  
+**Effort**: [est. hours]
 **Assignee**: Backend | Frontend | QA | DevOps
 
-**Description**:
+**Description (1–2 lines)**
 
-[Detailed description of what needs to be done]
-
-**Acceptance Criteria**:
-
-- [ ] Criterion 1
-- [ ] Criterion 2
-- [ ] Criterion 3
-
-**Dependencies**:
-
-- None (or list of task IDs)
-
-**Files to Modify**:
-
-- `path/to/file1.py`
-- `path/to/file2.ts`
-
-**Test Coverage**:
-
-- [ ] Unit tests for [component]
-- [ ] Integration tests for [feature]
-
-**Notes**:
-
-[Any additional context or considerations]
-
----
-
-### TASK-002: [Task Title]
-
-**Status**: Not Started | In Progress | Blocked | Complete
-
-**Priority**: High | Medium | Low  
-**Effort**: [X] hours  
-**Assignee**: Backend | Frontend | QA | DevOps
-
-**Description**:
-
-[Detailed description of what needs to be done]
-
-**Acceptance Criteria**:
+**Acceptance Criteria (concise)**
 
 - [ ] Criterion 1
 - [ ] Criterion 2
 
-**Dependencies**:
+**Implementation Steps (atomic checklist)**
 
-- TASK-001
+- [ ] Step 1: one clear action (file, command, small change)
+- [ ] Step 2: next small action (test, migration, commit)
+- [ ] Step 3: final small action (PR, run tests, document)
 
-**Files to Modify**:
+**Files to modify (minimal list)**
 
-- `path/to/file3.py`
+- `path/to/file1`
+- `path/to/file2`
 
-**Test Coverage**:
+**Test Coverage (minimal tests to add/run)**
 
-- [ ] Unit tests for [component]
+- [ ] Unit test: what to assert
+- [ ] Integration test: what to assert (if applicable)
 
----
+**Notes (short)**
 
-## Phase 2: Core Implementation
-
-### TASK-003: [Task Title]
-
-[Same structure as above]
-
----
-
-### TASK-004: [Task Title]
-
-[Same structure as above]
-
----
-
-## Phase 3: Integration & Testing
-
-### TASK-005: [Task Title]
-
-[Same structure as above]
-
----
-
-### TASK-006: [Task Title]
-
-[Same structure as above]
-
----
-
-## Phase 4: Documentation & Deployment
-
-### TASK-007: Update Documentation
-
-**Status**: Not Started
-
-**Priority**: Medium  
-**Effort**: 2 hours  
-**Assignee**: All
-
-**Description**:
-
-Update all relevant documentation to reflect the new feature.
-
-**Acceptance Criteria**:
-
-- [ ] README.md updated
-- [ ] API documentation updated
-- [ ] User guide updated (if applicable)
-- [ ] Architecture diagrams updated
-
-**Files to Modify**:
-
-- `README.md`
-- `docs/api.md`
-- `AGENTS.md` (if needed)
-
----
-
-### TASK-008: Prepare Deployment
-
-**Status**: Not Started
-
-**Priority**: High  
-**Effort**: 3 hours  
-**Assignee**: DevOps
-
-**Description**:
-
-Prepare deployment artifacts and configuration.
-
-**Acceptance Criteria**:
-
-- [ ] Database migrations created and tested
-- [ ] Environment variables documented
-- [ ] Deployment checklist created
-- [ ] Rollback plan documented
-
-**Dependencies**:
-
-- All previous tasks complete
-
----
-
-## Risk Register
-
-### High-Risk Tasks
-
-| Task ID  | Risk Description | Mitigation Strategy |
-| -------- | ---------------- | ------------------- |
-| TASK-XXX | [Risk]           | [Mitigation]        |
-| TASK-YYY | [Risk]           | [Mitigation]        |
+- Any quick important note or constraint
 
 ---
 
 ## Progress Tracking
 
-### Overall Progress
+- Use the per-task atomic checklists as the single source of truth for progress. Do not duplicate progress elsewhere.
+- At top of the file, add a small project progress summary if desired (optional):
 
-- [ ] Phase 1: Foundation (0/2 tasks)
-- [ ] Phase 2: Core Implementation (0/2 tasks)
-- [ ] Phase 3: Integration & Testing (0/2 tasks)
-- [ ] Phase 4: Documentation & Deployment (0/2 tasks)
-
-**Overall**: 0/8 tasks complete (0%)
-
-### Blockers
-
-[List any current blockers]
-
-### Changes from Original Plan
-
-[Document any deviations from the original design]
+- [ ] Phase 1: Foundation (n/m)
+- [ ] Phase 2: Implementation (n/m)
 
 ---
 
 ## Definition of Done
 
-Before marking this feature complete, ensure:
-
-- [ ] All tasks marked as Complete
-- [ ] All acceptance criteria met
-- [ ] All tests passing (unit, integration, E2E)
-- [ ] Code reviewed and approved
-- [ ] Documentation updated
-- [ ] No critical bugs
-- [ ] Security review passed
-- [ ] Performance benchmarks met
-- [ ] Deployed to staging and validated
-- [ ] User acceptance testing complete
+- [ ] All task implementation checklist items completed and reviewed
+- [ ] All acceptance criteria checked
+- [ ] All tests passing locally
+- [ ] PR created, reviewed, and merged
 
 ---
 
 ## Approval
 
-**Submitted by**: [Agent/Person]  
-**Submitted on**: [Date]  
-**Reviewed by**: [User]  
-**Approval Status**: Pending | Approved | Rejected  
-**Approval Date**: [Date]
+**Submitted by**: [Agent/Person]
+**Submitted on**: [Date]
+**Reviewed by**: [User]
+**Approval Status**: Pending | Approved | Rejected
 
-**Review Notes**:
-
-[Feedback from reviewer]
-
-**Completion Date**: [Date when all tasks done]
+When approving, reviewers should confirm: checklist granularity is sufficient, acceptance criteria are testable, and no checklist items were auto-marked without explicit approval.

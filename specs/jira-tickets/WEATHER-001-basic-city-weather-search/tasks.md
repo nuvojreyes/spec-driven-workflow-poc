@@ -1,3 +1,202 @@
+## Implementation Tasks: Basic City Weather Search (Simplified, Atomic)
+
+**Feature ID**: WEATHER-001
+**Created**: 2026-02-02
+**Owner**: Architect Agent
+**Status**: Draft
+
+---
+
+Purpose: concise, actionable, atomic steps for each task. Each checklist item should be small (15–240 minutes). Agents must request explicit human approval before marking items complete.
+
+---
+
+### TASK-001: Create Django `WeatherCache` model
+
+- [ ] Add `WeatherCache` class to `backend/api/models.py` with fields: `city_name`, `temperature`, `humidity`, `wind_speed`, `updated_at`.
+- [ ] Add unique constraint on `city_name` and indexes on `city_name` and `updated_at`.
+- [ ] Implement `__str__` and a simple `clean()` to normalize `city_name` (lowercase + trim).
+- [ ] Run `python manage.py makemigrations` and commit migration file.
+- [ ] Run `python manage.py migrate` and verify table exists.
+- [ ] Add unit test that creates and retrieves a `WeatherCache` entry.
+
+Acceptance: migration present, DB table exists, unit test passes.
+
+---
+
+### TASK-002: Implement OpenWeatherMap API client
+
+- [ ] Create `backend/api/weather_api_client.py` with `WeatherAPIClient` class.
+- [ ] Read `WEATHER_API_KEY` from environment and raise a helpful error if missing.
+- [ ] Implement `get_weather(city_name)` using HTTPS, 5s timeout, and 1 retry (exponential backoff).
+- [ ] Map common HTTP errors to explicit exceptions (`CityNotFoundError`, `RateLimitError`, generic `APIError`).
+- [ ] Add logging (no secrets) and docstrings.
+- [ ] Add unit tests mocking success, 404, timeout, and 429 responses.
+
+Acceptance: client added, env var used, tests pass.
+
+---
+
+### TASK-003: WeatherService (orchestration)
+
+- [ ] Create `backend/api/weather_service.py` with `WeatherService` class and `get_weather(city_name)` method.
+- [ ] Normalize input and check cache first.
+- [ ] If cache is fresh (<30 min) return cached data.
+- [ ] If cache stale or missing, call `WeatherAPIClient` and update cache atomically.
+- [ ] On API failure, return stale cache if available with a `warning` flag.
+- [ ] Add unit tests for cache hit/miss/stale-fallback and normalization.
+
+Acceptance: service added and tests cover behaviors.
+
+---
+
+### TASK-004: CacheManager utility
+
+- [ ] Implement `backend/api/cache_manager.py` with `get`, `save` (atomic `update_or_create`), `is_fresh`, and `cleanup_old_entries`.
+- [ ] Add a simple management command for `cleanup_old_entries`.
+- [ ] Add unit tests for `get`, `save`, `is_fresh`, and cleanup.
+
+Acceptance: cache manager implemented and tested.
+
+---
+
+### TASK-005: Weather API endpoint
+
+- [ ] Add GET `/api/weather?city=<name>` in `backend/api/views.py` (APIView or ViewSet).
+- [ ] Validate `city` parameter (2–100 chars) using a serializer or validator.
+- [ ] Call `WeatherService.get_weather()` and return JSON with `status`, `data`, `warning`.
+- [ ] Add rate limiting (100 requests/hour per IP) and CORS as needed.
+- [ ] Add unit tests for valid/invalid requests and error paths.
+
+Acceptance: endpoint implemented and tests pass.
+
+---
+
+### TASK-006: Input validation utilities
+
+- [ ] Add `backend/api/validators.py` with `validate_city_name()` regex for international chars.
+- [ ] Wire validator into serializers/views.
+- [ ] Add unit tests covering valid and invalid inputs.
+
+Acceptance: validation exists and is tested.
+
+---
+
+### TASK-007: Response TTL and headers
+
+- [ ] Ensure API responses include `cache_ttl` field and `Cache-Control` header.
+- [ ] Make TTL configurable in settings (default 1800s).
+- [ ] Add a unit test verifying header and TTL.
+
+Acceptance: TTL present and configurable.
+
+---
+
+### TASK-008: Frontend service
+
+- [ ] Create `frontend/src/app/services/weather.service.ts` with `getWeather(city)` returning unified model.
+- [ ] Handle loading, success, error states.
+- [ ] Add unit tests mocking HTTP client.
+
+Acceptance: frontend service added and tested.
+
+---
+
+### TASK-009: Search component
+
+- [ ] Create `SearchComponent` with input and submit button.
+- [ ] Validate input client-side (min 2 chars) and show validation errors.
+- [ ] Connect to `weather.service` and display loading state.
+- [ ] Add unit tests for interactions.
+
+Acceptance: component works and tests pass.
+
+---
+
+### TASK-010: Results UI
+
+- [ ] Implement results card showing temp, conditions, humidity, wind.
+- [ ] Show stale-data warning when applicable.
+- [ ] Add accessibility attributes and role-based locators used by tests.
+- [ ] Add snapshot/aria tests as appropriate.
+
+Acceptance: UI displays required fields and indicates stale data.
+
+---
+
+### TASK-011: Unit conversion utility
+
+- [ ] Add `src/app/utils/convert.ts` with Celsius↔Fahrenheit functions.
+- [ ] Add unit tests for conversions.
+
+Acceptance: utility added and tested.
+
+---
+
+### TASK-012: Logging & metrics
+
+- [ ] Add logging for cache hit/miss and API errors in backend modules.
+- [ ] Add simple counters for `cache_hit`, `cache_miss`, `api_errors` (in-memory or placeholder).
+- [ ] Document where logs/metrics are written locally.
+
+Acceptance: logging and basic metrics present.
+
+---
+
+### TASK-013: Backend tests
+
+- [ ] Add unit tests for models, cache manager, API client, and service.
+- [ ] Add an integration test that uses mocked external API to exercise flow.
+
+Acceptance: tests added and runnable via `python manage.py test`.
+
+---
+
+### TASK-014: Frontend tests
+
+- [ ] Add Angular integration tests for `SearchComponent` + `weather.service`.
+- [ ] Ensure tests run in CI/local with `npm test`.
+
+Acceptance: frontend tests added and passing.
+
+---
+
+### TASK-015: E2E Playwright test
+
+- [ ] Add Playwright test validating search flow and stale-cache scenario.
+- [ ] Document how to run E2E locally (backend required).
+
+Acceptance: E2E test exists and can be run locally.
+
+---
+
+### TASK-016: Documentation
+
+- [ ] Update `technical-design.md` with final data shapes and endpoint contract.
+- [ ] Add `README.md` in the ticket folder with run instructions and env vars.
+
+Acceptance: docs updated and reproducible steps present.
+
+---
+
+### TASK-017: Deployment checklist
+
+- [ ] Add `WEATHER_API_KEY` to `.env.example` and README deployment notes.
+- [ ] Add migration step to deployment checklist.
+- [ ] Verify `docker-compose` integration locally.
+
+Acceptance: deployment notes present.
+
+---
+
+### TASK-018: Final review & PR
+
+- [ ] Run the full test suite (backend + frontend + E2E).
+- [ ] Create PR `feature/WEATHER-001-core` → `master` with summary of simplification and changes.
+- [ ] Request reviews, address comments, and merge.
+
+Acceptance: PR created and merged; mark tasks complete.
+
 # Implementation Tasks: Basic City Weather Search
 
 **Feature ID**: WEATHER-001  
@@ -91,15 +290,15 @@ Create Django model for caching weather data with proper fields, indexes, and co
 
 **Implementation Steps**:
 
-1. Define WeatherCache model with all fields from schema
-2. Add unique constraint on city_name
-3. Add Meta class with indexes
-4. Implement `__str__` method
-5. Register model in admin (optional for MVP)
-6. Run `python manage.py makemigrations`
-7. Review generated migration file
-8. Run `python manage.py migrate`
-9. Verify in database (`python manage.py dbshell`)
+- [ ] Define WeatherCache model with all fields from schema
+- [ ] Add unique constraint on city_name
+- [ ] Add Meta class with indexes
+- [ ] Implement `__str__` method
+- [ ] Register model in admin (optional for MVP)
+- [ ] Run `python manage.py makemigrations`
+- [ ] Review generated migration file
+- [ ] Run `python manage.py migrate`
+- [ ] Verify in database (`python manage.py dbshell`)
 
 **Test Coverage**:
 
@@ -150,16 +349,16 @@ Create a Python client for interacting with the OpenWeatherMap API. This client 
 
 **Implementation Steps**:
 
-1. Install `requests` library (already in requirements.txt)
-2. Create WeatherAPIClient class
-3. Load API key from environment (`os.getenv('WEATHER_API_KEY')`)
-4. Implement `get_weather(city_name)` method
-5. Configure timeout (5 seconds)
-6. Parse JSON response into structured dict
-7. Handle HTTP errors (404 → CityNotFoundError, etc.)
-8. Add retry logic with exponential backoff
-9. Add logging for API calls and errors
-10. Write docstrings for methods
+- [ ] Install `requests` library (already in requirements.txt)
+- [ ] Create WeatherAPIClient class
+- [ ] Load API key from environment (`os.getenv('WEATHER_API_KEY')`)
+- [ ] Implement `get_weather(city_name)` method
+- [ ] Configure timeout (5 seconds)
+- [ ] Parse JSON response into structured dict
+- [ ] Handle HTTP errors (404 → CityNotFoundError, etc.)
+- [ ] Add retry logic with exponential backoff
+- [ ] Add logging for API calls and errors
+- [ ] Write docstrings for methods
 
 **Test Coverage**:
 
@@ -212,15 +411,15 @@ Create the weather service that orchestrates cache lookups and external API call
 
 **Implementation Steps**:
 
-1. Create WeatherService class
-2. Inject WeatherAPIClient (dependency injection)
-3. Implement cache lookup logic (check `updated_at` timestamp)
-4. Implement cache freshness check (30-minute TTL)
-5. Implement API call and cache update
-6. Implement stale-data fallback on API failures
-7. Add city name normalization
-8. Add logging for cache hits/misses
-9. Add metrics tracking (cache hit rate)
+- [ ] Create WeatherService class
+- [ ] Inject WeatherAPIClient (dependency injection)
+- [ ] Implement cache lookup logic (check `updated_at` timestamp)
+- [ ] Implement cache freshness check (30-minute TTL)
+- [ ] Implement API call and cache update
+- [ ] Implement stale-data fallback on API failures
+- [ ] Add city name normalization
+- [ ] Add logging for cache hits/misses
+- [ ] Add metrics tracking (cache hit rate)
 
 **Test Coverage**:
 
@@ -273,14 +472,14 @@ Create cache manager utility for interacting with the WeatherCache model. Encaps
 
 **Implementation Steps**:
 
-1. Create CacheManager class
-2. Implement `get(city_name)` using Django ORM
-3. Implement `is_fresh(cache_entry)` with timedelta check
-4. Implement `save(city_name, weather_data)` with update_or_create
-5. Implement `get_stale_data(city_name)` for fallback
-6. Implement `cleanup_old_entries()` for maintenance
-7. Add proper exception handling
-8. Add logging for cache operations
+- [ ] Create CacheManager class
+- [ ] Implement `get(city_name)` using Django ORM
+- [ ] Implement `is_fresh(cache_entry)` with timedelta check
+- [ ] Implement `save(city_name, weather_data)` with update_or_create
+- [ ] Implement `get_stale_data(city_name)` for fallback
+- [ ] Implement `cleanup_old_entries()` for maintenance
+- [ ] Add proper exception handling
+- [ ] Add logging for cache operations
 
 **Test Coverage**:
 
@@ -393,12 +592,12 @@ Implement robust input validation for city name parameter. Prevents injection at
 
 **Implementation Steps**:
 
-1. Create `validators.py` file
-2. Define regex pattern: `^[a-zA-Z\s\-À-ÿ]{2,100}$`
-3. Create `validate_city_name(city_name)` function
-4. Raise ValidationError with user-friendly message
-5. Integrate into WeatherViewSet
-6. Test with various inputs
+- [ ] Create `validators.py` file
+- [ ] Define regex pattern: `^[a-zA-Z\s\-À-ÿ]{2,100}$`
+- [ ] Create `validate_city_name(city_name)` function
+- [ ] Raise ValidationError with user-friendly message
+- [ ] Integrate into WeatherViewSet
+- [ ] Test with various inputs
 
 **Test Coverage**:
 
@@ -447,11 +646,11 @@ Configure Django URL routing to expose the weather API endpoint.
 
 **Implementation Steps**:
 
-1. Create/update `backend/api/urls.py`
-2. Define URL pattern for weather endpoint
-3. Include API urls in project urls
-4. Test URL routing manually
-5. Verify query parameters work
+- [ ] Create/update `backend/api/urls.py`
+- [ ] Define URL pattern for weather endpoint
+- [ ] Include API urls in project urls
+- [ ] Test URL routing manually
+- [ ] Verify query parameters work
 
 **Test Coverage**:
 
@@ -512,14 +711,14 @@ Create Angular service for communicating with the backend weather API. Handles H
 
 **Implementation Steps**:
 
-1. Generate service: `ng generate service services/weather`
-2. Inject HttpClient
-3. Define API base URL (from environment)
-4. Implement `getWeather(cityName)` method
-5. Create WeatherData interface
-6. Transform backend response to frontend model
-7. Implement error handling (map HTTP errors to user messages)
-8. Add RxJS operators (catchError, map)
+- [ ] Generate service: `ng generate service services/weather`
+- [ ] Inject HttpClient
+- [ ] Define API base URL (from environment)
+- [ ] Implement `getWeather(cityName)` method
+- [ ] Create WeatherData interface
+- [ ] Transform backend response to frontend model
+- [ ] Implement error handling (map HTTP errors to user messages)
+- [ ] Add RxJS operators (catchError, map)
 
 **Test Coverage**:
 
@@ -577,12 +776,12 @@ Create TypeScript service for client-side temperature and wind speed unit conver
 
 **Implementation Steps**:
 
-1. Generate service: `ng generate service services/unit-converter`
-2. Implement conversion methods with formulas
-3. Implement local storage read/write
-4. Set default unit to Celsius
-5. Add unit preference persistence
-6. Write comprehensive unit tests
+- [ ] Generate service: `ng generate service services/unit-converter`
+- [ ] Implement conversion methods with formulas
+- [ ] Implement local storage read/write
+- [ ] Set default unit to Celsius
+- [ ] Add unit preference persistence
+- [ ] Write comprehensive unit tests
 
 **Test Coverage**:
 
@@ -640,16 +839,16 @@ Create main Angular component for weather search UI. Includes search input, butt
 
 **Implementation Steps**:
 
-1. Generate component: `ng generate component components/weather-search`
-2. Create reactive form with city input
-3. Add input validation (pattern, minLength, maxLength)
-4. Implement `onSearch()` method
-5. Call WeatherService and handle response
-6. Implement loading state (boolean flag)
-7. Display weather results in template
-8. Display error messages
-9. Style with responsive CSS
-10. Add keyboard event listener (Enter key)
+- [ ] Generate component: `ng generate component components/weather-search`
+- [ ] Create reactive form with city input
+- [ ] Add input validation (pattern, minLength, maxLength)
+- [ ] Implement `onSearch()` method
+- [ ] Call WeatherService and handle response
+- [ ] Implement loading state (boolean flag)
+- [ ] Display weather results in template
+- [ ] Display error messages
+- [ ] Style with responsive CSS
+- [ ] Add keyboard event listener (Enter key)
 
 **Test Coverage**:
 
@@ -704,14 +903,14 @@ Add temperature unit toggle button to weather display. Allows user to switch bet
 
 **Implementation Steps**:
 
-1. Inject UnitConverterService into component
-2. Add `currentUnit` property (C or F)
-3. Load initial unit from service (default: C)
-4. Create `toggleUnit()` method
-5. Add conversion logic in template (using pipe or method)
-6. Create toggle button in HTML
-7. Style toggle button (active/inactive states)
-8. Test preference persistence
+- [ ] Inject UnitConverterService into component
+- [ ] Add `currentUnit` property (C or F)
+- [ ] Load initial unit from service (default: C)
+- [ ] Create `toggleUnit()` method
+- [ ] Add conversion logic in template (using pipe or method)
+- [ ] Create toggle button in HTML
+- [ ] Style toggle button (active/inactive states)
+- [ ] Test preference persistence
 
 **Test Coverage**:
 
@@ -883,16 +1082,16 @@ Create integration tests for backend API that test the full request/response cyc
 
 **Implementation Steps**:
 
-1. Configure test database settings
-2. Create test fixtures for weather data
-3. Mock external OpenWeatherMap API
-4. Write test: Successful weather retrieval (cache miss)
-5. Write test: Successful weather retrieval (cache hit)
-6. Write test: Stale cache with API success
-7. Write test: Stale cache with API failure (fallback)
-8. Write test: Invalid input returns 400
-9. Write test: City not found returns 404
-10. Run tests: `python manage.py test api.tests.test_integration`
+- [ ] Configure test database settings
+- [ ] Create test fixtures for weather data
+- [ ] Mock external OpenWeatherMap API
+- [ ] Write test: Successful weather retrieval (cache miss)
+- [ ] Write test: Successful weather retrieval (cache hit)
+- [ ] Write test: Stale cache with API success
+- [ ] Write test: Stale cache with API failure (fallback)
+- [ ] Write test: Invalid input returns 400
+- [ ] Write test: City not found returns 404
+- [ ] Run tests: `python manage.py test api.tests.test_integration`
 
 **Test Coverage**:
 
@@ -940,15 +1139,15 @@ Create comprehensive unit and component tests for Angular weather search compone
 
 **Implementation Steps**:
 
-1. Configure TestBed for each test suite
-2. Mock HttpClient for WeatherService tests
-3. Test successful API call
-4. Test error handling
-5. Test unit conversions with known values
-6. Test component rendering
-7. Test user interactions (click, input)
-8. Run tests: `npm test`
-9. Generate coverage report: `npm test -- --code-coverage`
+- [ ] Configure TestBed for each test suite
+- [ ] Mock HttpClient for WeatherService tests
+- [ ] Test successful API call
+- [ ] Test error handling
+- [ ] Test unit conversions with known values
+- [ ] Test component rendering
+- [ ] Test user interactions (click, input)
+- [ ] Run tests: `npm test`
+- [ ] Generate coverage report: `npm test -- --code-coverage`
 
 **Test Coverage**:
 
@@ -1001,18 +1200,18 @@ Create comprehensive E2E tests using Playwright that validate all user journeys 
 
 **Implementation Steps**:
 
-1. Start backend: `python manage.py runserver`
-2. Start frontend: `cd frontend && npm start`
-3. Create test file in `qa/tests/`
-4. Write test: Search for "London" → verify results display
-5. Write test: Enter "City123" → verify error message
-6. Write test: Search for "Nonexistentcity" → verify 404 error
-7. Write test: Click search → verify loading indicator
-8. Write test: Toggle unit → verify temperature converts
-9. Write test: Test on different viewports
-10. Write test: Tab navigation and Enter key
-11. Run tests: `cd qa && npm test`
-12. Review test report
+- [ ] Start backend: `python manage.py runserver`
+- [ ] Start frontend: `cd frontend && npm start`
+- [ ] Create test file in `qa/tests/`
+- [ ] Write test: Search for "London" → verify results display
+- [ ] Write test: Enter "City123" → verify error message
+- [ ] Write test: Search for "Nonexistentcity" → verify 404 error
+- [ ] Write test: Click search → verify loading indicator
+- [ ] Write test: Toggle unit → verify temperature converts
+- [ ] Write test: Test on different viewports
+- [ ] Write test: Tab navigation and Enter key
+- [ ] Run tests: `cd qa && npm test`
+- [ ] Review test report
 
 **Test Coverage**:
 
@@ -1064,12 +1263,12 @@ Update project documentation to reflect the new weather search feature.
 
 **Implementation Steps**:
 
-1. Update main README with feature overview
-2. Document API endpoint in backend README
-3. Add setup instructions for WEATHER_API_KEY
-4. Document frontend components
-5. Add code examples for common usage
-6. Update changelog with version and features
+- [ ] Update main README with feature overview
+- [ ] Document API endpoint in backend README
+- [ ] Add setup instructions for WEATHER_API_KEY
+- [ ] Document frontend components
+- [ ] Add code examples for common usage
+- [ ] Update changelog with version and features
 
 **Test Coverage**:
 
@@ -1119,16 +1318,16 @@ Configure production deployment settings and verify all environment variables ar
 
 **Implementation Steps**:
 
-1. Create production settings module or use environment-based config
-2. Configure environment variables in ECS task definition
-3. Set up AWS Secrets Manager for API keys
-4. Configure ALLOWED_HOSTS
-5. Test production settings locally (with DEBUG=False)
-6. Run Django deployment check: `python manage.py check --deploy`
-7. Build Docker image for production
-8. Push to AWS ECR
-9. Update ECS service
-10. Verify deployment
+- [ ] Create production settings module or use environment-based config
+- [ ] Configure environment variables in ECS task definition
+- [ ] Set up AWS Secrets Manager for API keys
+- [ ] Configure ALLOWED_HOSTS
+- [ ] Test production settings locally (with DEBUG=False)
+- [ ] Run Django deployment check: `python manage.py check --deploy`
+- [ ] Build Docker image for production
+- [ ] Push to AWS ECR
+- [ ] Update ECS service
+- [ ] Verify deployment
 
 **Test Coverage**:
 

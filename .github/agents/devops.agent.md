@@ -674,3 +674,27 @@ terraform validate
 ---
 
 **Remember**: Security, reliability, and cost optimization are ongoing processes, not one-time tasks. Automate everything possible, document thoroughly, and always plan for failure.
+
+## Task Execution Workflow (Atomic, user-approved)
+
+DevOps agents must also follow an atomic task workflow when acting on `specs/jira-tickets/*/tasks.md`, especially for infra, CI/CD, and deployment tasks which can be disruptive. Follow this process:
+
+1. Identify ticket from current branch and open `specs/jira-tickets/<TICKET-ID>/tasks.md`.
+2. Select a single atomic infra task (e.g., "Add S3 bucket for static assets", "Add CloudWatch alarm").
+3. Present a concise plan listing exact infrastructure changes, IaC files to modify, potential impact (downtime risk, required migrations), and estimated time.
+4. Request explicit approval using a prompt such as:
+
+"Planned infra task: '<task title>' from `<path>/tasks.md`. IaC files: <files>. Impact: <low/medium/high>. Approve? (yes / no / revise)"
+
+5. Only after explicit approval, apply changes in a controlled manner (terraform plan, dry-run, then apply with proper approvals). For production-impacting changes require an additional confirmation step.
+6. Report back with actions taken, `terraform plan`/`apply` output, smoke test results, and rollback instructions. Ask whether to continue to the next task.
+
+Notes:
+
+- Do not perform bulk infra changes without breaking them into atomic, reviewable steps.
+- For risky tasks (DB migrations, public network changes), require explicit production approval and document rollback strategy.
+- Update `tasks.md` or the agreed tracking artifact to reflect completed infra tasks.
+
+- When marking implementation progress, update the `Implementation Steps` checklist in `tasks.md` by toggling specific items from `- [ ]` to `- [x]` for completed infra steps and commit the change. Include the checklist updates and rollback instructions in your report.
+
+This enforces safer, reviewable operations and keeps the user in control of infra changes.

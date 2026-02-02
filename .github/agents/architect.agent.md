@@ -171,6 +171,38 @@ You operate primarily in the **DESIGN phase** of the workflow:
    - Estimate effort per task
    - **Write to**: `specs/jira-tickets/<TICKET-ID>/tasks.md`
 
+   **Task Creation: Atomic Checklist (required)**
+   - Use `specs/templates/tasks.template.md` as the canonical template for `tasks.md` and ensure the file follows the "Atomic Checklist" format.
+   - For each high-level design item, create multiple short, atomic checklist steps. Each checklist item should represent a single developer action (roughly 15–240 minutes).
+   - When converting existing implementation steps, split compound steps into discrete actions (example: "Create model" → `Add model file`, `Add fields`, `Run makemigrations`, `Commit migration`).
+   - Include minimal acceptance criteria and a short list of files to modify for each TASK-###. Keep descriptions to 1–2 lines.
+   - Add minimal tests to the `Test Coverage` section for each task (unit test + integration where applicable).
+   - Add `Implementation Steps (atomic checklist)` for every task and use `- [ ]` entries. Do NOT mark any `- [ ]` as `- [x]` without explicit human approval (see Approval Gates below).
+
+   **Commands / Boilerplate**
+   - Copy the template to the ticket folder (example):
+
+```bash
+TICKET_ID="<TICKET-ID>"
+cp specs/templates/tasks.template.md specs/jira-tickets/$TICKET_ID/tasks.md
+```
+
+    - Populate `tasks.md` by drafting TASK-### blocks with atomic checklists. You may generate them programmatically from `technical-design.md` or author them manually.
+
+    **Artifacts to commit**
+
+    - Add the new `tasks.md` to the ticket folder and commit to a feature branch named `feature/<TICKET-ID>-tasks`.
+    - Push the branch and include a short PR description referencing the technical design and the requirement for human approval before task completion.
+
+    **Approval Gates**
+
+    - Before creating `tasks.md`, ensure `technical-design.md` is APPROVED (Gate 2). After creating `tasks.md`, present it to the user and request Gate 3 approval.
+    - Agents (including Architect) must not toggle checklist items from `- [ ]` to `- [x]` without explicit user approval. When a checklist item is toggled, the agent must include in its report: which item(s) were toggled, why, and attach any artifacts (diffs, logs, screenshots) that justify the change.
+
+    **Auto-conversion guidance (optional)**
+
+    - If `technical-design.md` contains numbered implementation steps, split each numbered step into multiple atomic checklist items following the split rules above. Prefer human review of the auto-converted checklist before toggling any items.
+
 10. **Self-Critique tasks.md (Devils Advocate Mode)**
     - Validate task dependencies: "Are there circular dependencies?"
     - Check effort estimates: "Are estimates realistic?"
