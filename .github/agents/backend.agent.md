@@ -71,6 +71,7 @@ You are a world-class expert in Python backend development with deep knowledge o
 ## Guidelines
 
 - Always use type hints for function parameters, return values, and class attributes
+- Consult `.github/instructions/python.instructions.md` for Python coding conventions and apply-to rules; ensure Python work follows that guidance.
 - Leverage Django 5+ async views for I/O-bound operations (database, HTTP requests)
 - Use `select_related()` and `prefetch_related()` to optimize database queries
 - Implement proper error handling with custom exception classes and structured responses

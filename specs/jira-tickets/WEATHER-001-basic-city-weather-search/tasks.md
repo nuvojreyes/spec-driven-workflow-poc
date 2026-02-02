@@ -13,12 +13,12 @@ Purpose: concise, actionable, atomic steps for each task. Each checklist item sh
 
 ### TASK-001: Create Django `WeatherCache` model
 
-- [ ] Add `WeatherCache` class to `backend/api/models.py` with fields: `city_name`, `temperature`, `humidity`, `wind_speed`, `updated_at`.
-- [ ] Add unique constraint on `city_name` and indexes on `city_name` and `updated_at`.
-- [ ] Implement `__str__` and a simple `clean()` to normalize `city_name` (lowercase + trim).
-- [ ] Run `python manage.py makemigrations` and commit migration file.
-- [ ] Run `python manage.py migrate` and verify table exists.
-- [ ] Add unit test that creates and retrieves a `WeatherCache` entry.
+- [x] Add `WeatherCache` class to `backend/api/models.py` with fields: `city_name`, `temperature`, `humidity`, `wind_speed`, `updated_at`.
+- [x] Add unique constraint on `city_name` and indexes on `city_name` and `updated_at`.
+- [x] Implement `__str__` and a simple `clean()` to normalize `city_name` (lowercase + trim).
+- [x] Run `python manage.py makemigrations` and commit migration file.
+- [x] Run `python manage.py migrate` and verify table exists.
+- [x] Add unit test that creates and retrieves a `WeatherCache` entry.
 
 Acceptance: migration present, DB table exists, unit test passes.
 
