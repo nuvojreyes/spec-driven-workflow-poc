@@ -1,0 +1,11 @@
+# Don't ignore anything by default - we want to track all specs
+# Optionally add patterns here if needed
+
+# Example: ignore temporary files
+*.bak
+*.tmp
+*~
+
+# Example: ignore OS-specific files
+.DS_Store
+Thumbs.db

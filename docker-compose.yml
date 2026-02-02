@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - PYTHONUNBUFFERED=1
+    command: >
+      sh -c "pip install -r requirements.txt && python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./frontend:/app
+    ports:
+      - "4200:4200"
+    command: >
+      sh -c "npm install && npx ng serve --host 0.0.0.0 --port 4200"
+
+  qa:
+    build:
+      context: ./qa
+      dockerfile: Dockerfile
+    depends_on:
+      - backend
+    volumes:
+      - ./qa:/app
+    entrypoint: ["npx", "playwright", "test"]
+    # Run with: docker-compose run --rm qa
