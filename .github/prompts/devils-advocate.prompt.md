@@ -40,6 +40,7 @@ First, thoroughly review:
 - Relevant code files (if analyzing implementation)
 
 **Note**: Devils Advocate is **mandatory** at 3 points in the workflow:
+
 1. After Architect Agent creates technical-design.md
 2. After Tasks Agent creates tasks.md
 3. After Implementation Agents complete all tasks

@@ -34,7 +34,7 @@ Jira Ticket (via MCP)
 ├─ Creates technical-design.md
 └─ MANDATORY: Devils Advocate
          ↓
-[Tasks Agent]  
+[Tasks Agent]
 ├─ Creates tasks.md
 ├─ MANDATORY: Devils Advocate
 └─ REQUEST APPROVAL (SINGLE GATE)
@@ -53,16 +53,18 @@ Create **`technical-design.md`** with architecture, tech stack, data models, and
 ### Architect Agent Workflow
 
 1. **FETCH Jira Ticket via MCP**
+
    ```bash
    # Extract ticket ID from branch name
    TICKET_ID=$(git branch --show-current | sed 's/feature\///')
    ```
-   
+
    - Use Jira MCP to fetch ticket: `jira_getIssue(ticket_id=$TICKET_ID)`
    - Extract: summary, description, acceptance criteria, story points
    - This Jira ticket is the **sole source of requirements** (no requirements.md)
 
 2. **CREATE Ticket Directory**
+
    ```bash
    mkdir -p specs/jira-tickets/$TICKET_ID/.archive
    cp specs/templates/technical-design.template.md specs/jira-tickets/$TICKET_ID/technical-design.md
@@ -89,7 +91,7 @@ Create **`technical-design.md`** with architecture, tech stack, data models, and
    - "Where are the security vulnerabilities?"
    - "Are there performance bottlenecks?"
    - "What edge cases did we miss?"
-   
+
    **Document your critique and refinements made.**
 
 6. **REFINE technical-design.md**
@@ -108,14 +110,17 @@ Create **`technical-design.md`** with architecture, tech stack, data models, and
    **Location**: `specs/jira-tickets/[TICKET-ID]/technical-design.md`
 
    **Key Decisions**:
+
    - [Decision 1 with rationale]
    - [Decision 2 with rationale]
 
    **Technology Stack**:
+
    - Backend: [Tech choices]
    - Frontend: [Tech choices]
 
    **Devils Advocate Applied**: Yes
+
    - Concern 1: [How addressed]
    - Concern 2: [How addressed]
 
@@ -135,22 +140,23 @@ Create **`tasks.md`** with detailed, atomic task checklist for implementation.
 ### Tasks Agent Workflow
 
 1. **READ Inputs**
+
    ```bash
    TICKET_ID=$(git branch --show-current | sed 's/feature\///')
    ```
-   
+
    - Read `specs/jira-tickets/$TICKET_ID/technical-design.md`
    - Fetch Jira ticket via MCP for acceptance criteria context
    - Understand the architecture, components, and design decisions
 
 2. **COPY Tasks Template**
+
    ```bash
    cp specs/templates/tasks.template.md specs/jira-tickets/$TICKET_ID/tasks.md
    ```
 
 3. **CREATE Atomic Task Breakdown**
    For each component/phase in the technical design:
-   
    - Create TASK-### blocks with atomic checklist steps
    - Each checklist item = single developer action (15-240 minutes)
    - Include: description, acceptance criteria, implementation steps, files, tests
@@ -170,7 +176,7 @@ Create **`tasks.md`** with detailed, atomic task checklist for implementation.
    - "Can each task be completed independently once dependencies are met?"
    - "Are acceptance criteria specific and testable?"
    - "Did I include all necessary test tasks?"
-   
+
    **Document your critique and refinements made.**
 
 5. **REFINE tasks.md**
@@ -190,18 +196,21 @@ Create **`tasks.md`** with detailed, atomic task checklist for implementation.
    **Location**: `specs/jira-tickets/[TICKET-ID]/tasks.md`
 
    **Summary**:
+
    - Total tasks: [N]
    - Estimated effort: [X hours/days]
    - Phases: [List phases]
 
    **Task Overview**:
+
    1. TASK-001: [Title] - [Effort]
    2. TASK-002: [Title] - [Effort]
-   ...
+      ...
 
    **Dependencies**: [Key dependencies]
 
    **Risks Identified**:
+
    - [Risk 1]: Mitigation: [Strategy]
 
    **Devils Advocate Applied**: Yes - [Key concerns addressed]
@@ -476,4 +485,3 @@ After all tasks complete:
 - See `.github/instructions/spec-driven-workflow.instructions.md` for complete methodology
 - See `.github/agents/architect.agent.md` for Architect Agent details
 - See `.github/agents/tasks.agent.md` for Tasks Agent details
-
