@@ -1,537 +1,261 @@
-# Weather Intelligence Platform
+# Specification-Driven Development Workflow
 
-A full-stack weather application built with **Django 4.2+** (backend), **Angular 16** (frontend), and **Playwright** (E2E testing), following a **Specification-Driven Development (SDD)** workflow.
+This project uses a **Spec-Driven Development (SDD)** methodology where all features are planned through technical design and atomic task breakdown before implementation begins.
 
-## Project Overview
+## How the Workflow Works
 
-This monorepo contains:
+The workflow transforms Jira tickets into implemented features through three phases with a single approval gate:
 
-- **Backend**: Django REST API (Python) on port 8000
-- **Frontend**: Angular single-page application on port 4200
-- **QA**: Playwright end-to-end tests (TypeScript)
+## How the Workflow Works
 
-### Current Status
+The workflow transforms Jira tickets into implemented features through three phases with a single approval gate:
 
-- **Feature Branch**: `feature/WEATHER-001-core`
-- **Active Feature**: WEATHER-001 - Basic City Weather Search
-- **Main Branch**: `master`
+### Phase 1: Design (Architect Agent)
+- **Input**: Jira ticket (fetched via MCP)
+- **Output**: `technical-design.md` with architecture, data models, API contracts
+- **Quality Control**: Mandatory Devils Advocate self-critique
+- **Location**: `specs/jira-tickets/<TICKET-ID>/technical-design.md`
 
-## Quick Start
+### Phase 2: Plan (Tasks Agent)
+- **Input**: `technical-design.md` + Jira ticket context
+- **Output**: `tasks.md` with atomic task checklist
+- **Quality Control**: Mandatory Devils Advocate self-critique
+- **Approval Gate**: User reviews and approves implementation plan ✓
+
+### Phase 3: Implementation (Backend/Frontend Agents)
+- **Input**: Jira ticket + `technical-design.md` + `tasks.md`
+- **Process**: Execute tasks one at a time, update checklist after each
+- **Quality Control**: Mandatory Devils Advocate review after ALL tasks
+- **Output**: Working code, tests, PR
+
+```
+Jira Ticket
+     ↓
+[Architect Agent] → technical-design.md → Devils Advocate
+     ↓
+[Tasks Agent] → tasks.md → Devils Advocate
+     ↓
+[APPROVAL GATE] ← User approves plan
+     ↓
+[Implementation Agents] → Code + Tests → Devils Advocate
+     ↓
+Pull Request
+```
+
+## Working with a Jira Ticket: Step-by-Step Guide
 
 ### Prerequisites
+- Access to Jira (MCP connection configured)
+- Git repository cloned
+- Development environment ready (see [AGENTS.md](AGENTS.md) for setup)
 
-- Python 3.8+
-- Node.js 16+ and npm
-- Docker and Docker Compose (optional)
-- Git
-
-### Option 1: Docker (Recommended for Quick Start)
+### Step 1: Create Feature Branch
 
 ```bash
-# Clone and start all services
-git clone <repository-url>
-cd sdd-ai-weather
-docker-compose up --build
-
-# Access the application
-# Backend: http://127.0.0.1:8000
-# Frontend: http://localhost:4200
+# Use Jira ticket ID in branch name
+git checkout -b feature/PROJ-123-brief-description
 ```
 
-### Option 2: Local Development
+**Example**: `feature/WEATHER-001-city-search`
 
-**Terminal 1 - Backend:**
+### Step 2: Invoke Architect Agent
 
-```bash
-# Create and activate virtual environment
-python3 -m venv .venv
-source .venv/bin/activate  # macOS/Linux
-# .venv\Scripts\activate   # Windows
-
-# Install dependencies
-pip install -r backend/requirements.txt
-
-# Run migrations and start server
-python backend/manage.py migrate
-python backend/manage.py runserver
-# Backend runs on http://127.0.0.1:8000
+**Option A: Via GitHub Copilot/Claude**
+```
+@workspace use architect agent for PROJ-123
 ```
 
-**Terminal 2 - Frontend:**
-
-```bash
-# Install dependencies and start dev server
-cd frontend
-npm install
-npm start
-# Frontend runs on http://localhost:4200
-```
-
-**Terminal 3 - QA (Optional):**
-
-```bash
-# Install dependencies and run tests
-cd qa
-npm install
-npx playwright install
-npm test
-```
-
-## Specification-Driven Development Workflow
-
-This project follows a **Spec-Driven Development (SDD)** methodology where all features start with specifications before implementation.
-
-### Core Workflow
-
-```
-┌──────────────────┐
-│ Architect Agent  │ ← Phase 1: DESIGN
-│  (Design)        │    Creates: technical-design.md
-│                  │    MANDATORY: Devils Advocate
-└───────┬───────────┘
-         ↓
-┌──────────────────┐
-│   Tasks Agent    │ ← Phase 2: PLAN
-│    (Tasks)       │    Creates: tasks.md
-│                  │    MANDATORY: Devils Advocate
-└───────┬───────────┘
-         ↓ [SINGLE APPROVAL GATE]
-┌──────────────────┐
-│ Implementation   │ ← Phase 3-5: IMPLEMENT, VALIDATE, REFLECT
-│   (Dev Agents)   │    Backend, Frontend agents
-│                  │    MANDATORY: Devils Advocate after ALL tasks
-└──────────────────┘
-```
-
-### Core Artifacts
-
-Every feature maintains two key documents in `specs/jira-tickets/<TICKET-ID>/`:
-
-1. **technical-design.md** - Architecture, data models, API contracts (created by Architect Agent)
-2. **tasks.md** - Detailed implementation plan with atomic tasks (created by Tasks Agent)
-
-**Note**: Jira tickets serve as the primary source of requirements. No separate requirements.md file is needed.
-
-### EARS Notation
-
-Requirements use **EARS (Easy Approach to Requirements Syntax)**:
-
-- **Event-driven**: `WHEN [trigger] THE SYSTEM SHALL [behavior]`
-- **State-driven**: `WHILE [state] THE SYSTEM SHALL [behavior]`
-- **Unwanted**: `IF [condition] THEN THE SYSTEM SHALL [response]`
-
-**Example:**
-
-```markdown
-REQ-001: Weather Search
-WHEN a user enters a city name and clicks "Search",
-THE SYSTEM SHALL retrieve and display weather data within 2 seconds.
-```
-
-## Agent Ecosystem
-
-Specialized AI agents handle different aspects of development:
-
-### Available Agents
-
-Located in `.github/agents/`:
-
-| Agent               | Role                      | Primary Responsibility                    |
-| ------------------- | ------------------------- | ----------------------------------------- |
-| **Architect**       | Technical Design          | Create technical-design.md from Jira      |
-| **Tasks**           | Implementation Planning   | Create tasks.md with atomic task breakdown|
-| **Backend**         | Django/Python Development | Implement backend features per tasks.md   |
-| **Frontend**        | Angular Development       | Implement frontend features per tasks.md  |
-| **QA**              | Testing & Quality         | Create E2E tests, validate Jira criteria  |
-| **DevOps**          | Infrastructure & CI/CD    | Docker, deployment, pipelines             |
-| **Devils Advocate** | Critical Analysis         | Challenge assumptions, find flaws         |
-
-### When to Use Which Agent
-
-- **Starting a new feature?** → Architect Agent (`.github/agents/architect.agent.md`) - fetches Jira and creates design
-- **Need implementation plan?** → Tasks Agent (`.github/agents/tasks.agent.md`) - creates task breakdown
-- **Implementing backend API?** → Backend Agent (`.github/agents/backend.agent.md`)
-- **Building UI components?** → Frontend Agent (`.github/agents/frontend.agent.md`)
-- **Writing tests?** → QA Agent (`.github/agents/qa.agent.md`)
-- **Need critical review?** → Devils Advocate (`.github/agents/devils-advocate.agent.md`)
-- **Deployment/Docker?** → DevOps Agent (`.github/agents/devops.agent.md`)
-
-### How to Use Agents
-
-**Via GitHub Copilot or Claude:**
-
-```
-@workspace use architect agent for WEATHER-001
-@workspace use tasks agent to create implementation plan
-@workspace use backend agent to implement the API
-```
-
-**Or invoke prompts directly:**
-
+**Option B: Via Prompt**
 ```
 @workspace use design-solution prompt
-@workspace use devils-advocate prompt
 ```
 
-See `.github/prompts/` for all available prompts.
+**What the Architect Agent does**:
+1. Extracts ticket ID from branch name
+2. Fetches Jira ticket via MCP (`jira_getIssue`)
+3. Analyzes requirements and acceptance criteria
+4. Researches codebase for patterns
+5. Creates `specs/jira-tickets/PROJ-123/technical-design.md`
+6. Applies Devils Advocate self-critique
+7. Notifies you that design is ready
 
-## Development Workflow
+**You review**: Check `technical-design.md` for architecture decisions, tech choices, and approach.
 
-### 1. Feature Development Process
+### Step 3: Invoke Tasks Agent
 
-**Step 1: Design (Architect Agent)**
+**Trigger**: After reviewing technical design
+
+**Option A: Via GitHub Copilot/Claude**
+```
+@workspace use tasks agent
+```
+
+**Option B: Continue with design-solution prompt**
+(It automatically invokes Tasks Agent after Architect completes)
+
+**What the Tasks Agent does**:
+1. Reads `technical-design.md`
+2. Fetches Jira ticket for acceptance criteria context
+3. Breaks down work into atomic tasks with checklists
+4. Creates `specs/jira-tickets/PROJ-123/tasks.md`
+5. Applies Devils Advocate self-critique
+6. Requests your approval
+
+### Step 4: Review and Approve Implementation Plan
+
+**Review checklist in `tasks.md`**:
+- [ ] All Jira acceptance criteria covered?
+- [ ] Tasks are atomic (one action per checklist item)?
+- [ ] Dependencies are clear?
+- [ ] Estimates seem realistic?
+- [ ] Test tasks included?
+
+**Approve or Request Changes**:
+- ✅ **"Approved"** → Proceed to implementation
+- 🔄 **"Revise [specific concerns]"** → Tasks Agent updates and resubmits
+- ❌ **"Reject"** → Return to Architect for redesign
+
+### Step 5: Implement Tasks (One at a Time)
+
+**Invoke Implementation Agent**:
+
+```
+@workspace use backend agent to implement TASK-001
+```
+
+or
+
+```
+@workspace use frontend agent to implement TASK-005
+```
+
+**Implementation workflow per task**:
+1. Agent requests approval before starting task
+2. You approve
+3. Agent executes atomic checklist items from `tasks.md`
+4. Agent runs tests
+5. Agent updates tasks.md checklist (marks items complete)
+6. Agent commits changes
+7. Repeat for next task
+
+**Key principles**:
+- One task at a time (no skipping ahead)
+- Each task approval ensures control
+- Checklist in `tasks.md` tracks progress
+- Tests run continuously
+
+### Step 6: Post-Implementation Review
+
+**After ALL tasks complete**, implementation agent performs mandatory Devils Advocate review:
+
+**Questions asked**:
+- Did we deviate from technical design? Why?
+- What technical debt was introduced?
+- Are all Jira acceptance criteria met?
+- Any security concerns?
+- Any edge cases missed?
+
+**Agent reports findings and addresses issues before PR creation.**
+
+### Step 7: Create Pull Request
+
+**After Devils Advocate review passes**:
 
 ```bash
-# User provides Jira ticket ID
-# Architect Agent fetches Jira ticket via MCP
-# Creates technical-design.md
-# Applies mandatory Devils Advocate self-critique
+git push origin feature/PROJ-123-brief-description
 ```
 
-**Step 2: Plan (Tasks Agent)**
+**Create PR with**:
+- Title: `feat(scope): brief description` (conventional commits)
+- Description: Links to Jira ticket, lists key changes
+- References: `specs/jira-tickets/PROJ-123/` artifacts
 
-```bash
-# Tasks Agent reads technical-design.md
-# Creates tasks.md with atomic task breakdown
-# Applies mandatory Devils Advocate self-critique
-# User approves implementation plan ✓ (SINGLE APPROVAL GATE)
-```
+**PR Review**:
+- Use `review-pr` prompt: `@workspace use review-pr prompt`
+- Verifies against Jira acceptance criteria
+- Checks technical design compliance
+- Validates code quality standards
 
-**Step 3: Implementation (Dev Agents)**
+### Step 8: Merge and Close
 
-```bash
-# Create feature branch
-git checkout -b feature/WEATHER-XXX-description
+Once PR is approved:
+1. Merge to main/master
+2. Update Jira ticket status
+3. Delete feature branch
+4. Deploy (if applicable)
 
-# Backend Agent implements API
-# Frontend Agent implements UI
-# Each task requires approval before execution
+## Spec Artifacts Reference
 
-# Run tests continuously
-python backend/manage.py test
-cd frontend && npm test
-cd qa && npm test
+Each Jira ticket produces these artifacts in `specs/jira-tickets/<TICKET-ID>/`:
 
-# After ALL tasks: mandatory Devils Advocate review
-```
+| File | Created By | Purpose |
+|------|-----------|---------|
+| `technical-design.md` | Architect Agent | Architecture, data models, API contracts, tech decisions |
+| `tasks.md` | Tasks Agent | Atomic task breakdown with checklists, estimates, dependencies |
+| `.archive/` | System | Previous versions of specs (if redesigned) |
 
-**Step 4: Validation & Deployment**
+**Note**: Jira ticket itself serves as the source of requirements. No separate `requirements.md` file is created.
 
-```bash
-# All tests pass
-# Code review
-# Merge to main
-# DevOps Agent deploys
-```
+## Available Agents
 
-### 2. Daily Development Commands
-
-**Start development servers:**
-
-```bash
-# Backend
-source .venv/bin/activate
-python backend/manage.py runserver
-
-# Frontend
-cd frontend && npm start
-
-# Full stack with Docker
-docker-compose up
-```
-
-**Run tests:**
-
-```bash
-# Backend tests
-python backend/manage.py test
-
-# Frontend tests
-cd frontend && npm test -- --watch=false
-
-# E2E tests (requires backend running)
-cd qa && npm test
-```
-
-**Database management:**
-
-```bash
-# Create migrations after model changes
-python backend/manage.py makemigrations
-
-# Apply migrations
-python backend/manage.py migrate
-
-# Reset database
-rm backend/db.sqlite3
-python backend/manage.py migrate
-```
-
-### 3. Git Workflow
-
-**Branch naming:**
-
-```
-feature/TICKET-XXX-brief-description
-bugfix/TICKET-XXX-brief-description
-```
-
-**Commit message format (Conventional Commits):**
-
-```
-type(scope): subject
-
-Examples:
-feat(backend): add weather search endpoint
-fix(frontend): resolve temperature conversion bug
-test(qa): add city search validation tests
-docs(readme): update setup instructions
-```
-
-## Project Structure
-
-```
-sdd-ai-weather/
-├── backend/              # Django REST API
-│   ├── api/             # API app (models, views, serializers)
-│   ├── project/         # Django project settings
-│   ├── manage.py        # Django management commands
-│   └── requirements.txt # Python dependencies
-├── frontend/            # Angular application
-│   ├── src/app/        # Angular components and services
-│   ├── src/environments/ # Environment configurations
-│   ├── angular.json    # Angular CLI configuration
-│   └── package.json    # Node dependencies
-├── qa/                 # Playwright E2E tests
-│   ├── tests/          # Test files
-│   ├── playwright.config.ts
-│   └── package.json
-├── specs/              # Feature specifications
-│   └── jira-tickets/
-│       └── WEATHER-XXX/
-│           ├── technical-design.md
-│           └── tasks.md
-├── .github/            # GitHub and AI agent configuration
-│   ├── agents/         # Agent definitions
-│   ├── prompts/        # Reusable workflow prompts
-│   ├── instructions/   # Coding standards and guidelines
-│   ├── copilot-instructions.md
-│   └── WORKFLOW.md     # Detailed SDD workflow
-├── AGENTS.md           # Complete agent ecosystem documentation
-├── docker-compose.yml  # Container orchestration
-└── README.md          # This file
-```
-
-## Coding Standards
-
-### Security (CRITICAL)
-
-This project follows **OWASP Top 10** security guidelines:
-
-- **Never commit secrets or API keys** - Use environment variables
-- **Validate all user inputs** - Prevent injection attacks
-- **Use parameterized queries** - Django ORM handles this
-- **Follow security instructions**: `.github/instructions/security-and-owasp.instructions.md`
-
-### Backend (Python/Django)
-
-- **Style Guide**: PEP 8
-- **Type Hints**: Required for function parameters and return values
-- **Models**: `PascalCase` (e.g., `WeatherCache`)
-- **Functions**: `snake_case` (e.g., `get_weather_data`)
-- See: `.github/instructions/python.instructions.md`
-
-### Frontend (Angular/TypeScript)
-
-- **Style Guide**: Angular Style Guide
-- **Type Safety**: Strict TypeScript mode enabled
-- **Components**: `PascalCase` + `Component` suffix
-- **Files**: `kebab-case` (e.g., `weather-search.component.ts`)
-- See: `.github/instructions/angular.instructions.md`
-
-### QA (Playwright/TypeScript)
-
-- **Test Structure**: Arrange-Act-Assert pattern
-- **Locators**: Prefer user-facing locators (role, label, text)
-- **Naming**: Descriptive test titles explaining the scenario
-- See: `.github/instructions/playwright-typescript.instructions.md`
-
-## Key Instruction Files
-
-Located in `.github/instructions/`:
-
-| File                                                     | Purpose                     |
-| -------------------------------------------------------- | --------------------------- |
-| `spec-driven-workflow.instructions.md`                   | SDD methodology             |
-| `python.instructions.md`                                 | Python/Django conventions   |
-| `angular.instructions.md`                                | Angular patterns            |
-| `playwright-typescript.instructions.md`                  | E2E testing standards       |
-| `security-and-owasp.instructions.md`                     | Security requirements       |
-| `git-workflow.instructions.md`                           | Git workflow, commits, PRs  |
-| `api-design.instructions.md`                             | REST API standards          |
-| `ci-cd.instructions.md`                                  | CI/CD pipeline standards    |
-| `containerization-docker-best-practices.instructions.md` | Docker guidelines           |
+| Agent | Use When | Invoke With |
+|-------|----------|-------------|
+| **Architect** | Starting a new feature | `@workspace use architect agent` |
+| **Tasks** | Need implementation plan | `@workspace use tasks agent` |
+| **Backend** | Implementing Django/Python code | `@workspace use backend agent` |
+| **Frontend** | Implementing Angular/TypeScript UI | `@workspace use frontend agent` |
+| **QA** | Writing E2E tests | `@workspace use qa agent` |
+| **Devils Advocate** | Need critical analysis | `@workspace use devils-advocate prompt` |
 
 ## Reusable Prompts
 
-Quick-start prompts in `.github/prompts/`:
+Located in `.github/prompts/`:
 
-| Prompt                           | Purpose                       |
-| -------------------------------- | ----------------------------- |
-| `design-solution.prompt.md`      | Create technical design       |
-| `devils-advocate.prompt.md`      | Get critical analysis         |
-| `review-pr.prompt.md`            | Review pull request           |
-| `generate-tests.prompt.md`       | Create test suite             |
-| `refactor-code.prompt.md`        | Improve code quality          |
-| `sync-documentation.prompt.md`   | Update all documentation      |
-| `conventional-commit.prompt.md`  | Generate commit message       |
+- `design-solution.prompt.md` - Architect + Tasks workflow
+- `devils-advocate.prompt.md` - Critical analysis
+- `review-pr.prompt.md` - PR review checklist
+- `generate-tests.prompt.md` - Create test suite
+- `refactor-code.prompt.md` - Code improvements
+- `sync-documentation.prompt.md` - Update docs
+- `conventional-commit.prompt.md` - Generate commit message
 
-## Testing
+## Quick Reference
 
-### Backend Tests
-
+**Start a new feature**:
 ```bash
-cd backend
-
-# Run all tests
-python manage.py test
-
-# Run with verbosity
-python manage.py test --verbosity=2
-
-# Run specific app
-python manage.py test api
+git checkout -b feature/PROJ-123-name
+@workspace use design-solution prompt
 ```
 
-### Frontend Tests
-
+**Check progress**:
 ```bash
-cd frontend
-
-# Run unit tests
-npm test
-
-# Run tests in headless mode
-npm test -- --watch=false
-
-# Run with coverage
-npm test -- --code-coverage
+# View task checklist
+cat specs/jira-tickets/PROJ-123/tasks.md
 ```
 
-### E2E Tests (Playwright)
-
-**Prerequisites:** Backend must be running on `http://127.0.0.1:8000`
-
+**Run tests**:
 ```bash
-cd qa
+# Backend
+python backend/manage.py test
 
-# Run all tests
-npm test
+# Frontend
+cd frontend && npm test
 
-# Run in headed mode
-npx playwright test --headed
-
-# Debug mode
-npx playwright test --debug
-
-# Generate HTML report
-npx playwright show-report
+# E2E (requires backend running)
+cd qa && npm test
 ```
 
-## Build and Deployment
-
-### Frontend Production Build
-
-```bash
-cd frontend
-npm run build
-# Output: dist/
-```
-
-### Backend Production Setup
-
-```bash
-# Collect static files
-python backend/manage.py collectstatic --noinput
-
-# Check deployment readiness
-python backend/manage.py check --deploy
-```
-
-### Docker Build
-
-```bash
-# Build all services
-docker-compose build
-
-# Build specific service
-docker-compose build backend
-docker-compose build frontend
-```
-
-## Troubleshooting
-
-### Common Issues
-
-**"No module named django"**
-
-```bash
-source .venv/bin/activate  # Activate virtual environment
-```
-
-**"ng: command not found"**
-
-```bash
-npx @angular/cli@16 serve  # Use npx instead
-```
-
-**"Target page closed" (Playwright)**
-
-```bash
-# Ensure backend is running
-python backend/manage.py runserver
-```
-
-**Port already in use**
-
-```bash
-# Backend: Use different port
-python backend/manage.py runserver 8001
-
-# Frontend: Use different port
-ng serve --port 4201
-```
-
-### Logging
-
-- **Backend**: Django logs to console, check `backend/project/settings.py`
-- **Frontend**: Check browser DevTools console
-- **QA**: Check `qa/test-results/` directory for artifacts
-
-## Additional Resources
-
-- **Complete Agent Guide**: [AGENTS.md](AGENTS.md)
-- **SDD Workflow Details**: [.github/instructions/spec-driven-workflow.instructions.md](.github/instructions/spec-driven-workflow.instructions.md)
-- **Current Feature Spec**: [specs/jira-tickets/WEATHER-001-basic-city-weather-search/technical-design.md](specs/jira-tickets/WEATHER-001-basic-city-weather-search/technical-design.md)
-
-## Port Reference
-
-- Backend API: `http://127.0.0.1:8000`
-- Backend Admin: `http://127.0.0.1:8000/admin`
-- Frontend: `http://localhost:4200`
-- API Endpoint: `http://127.0.0.1:8000/api/`
-
-## Tech Stack
-
-- **Backend**: Django 4.2+, Python 3.8+, SQLite (dev), PostgreSQL (prod)
-- **Frontend**: Angular 16, TypeScript 5.1, RxJS 7.8
-- **QA**: Playwright 1.38, TypeScript
-- **Containerization**: Docker, Docker Compose
-- **CI/CD**: GitHub Actions (planned)
-- **Deployment**: AWS Fargate (production)
+**Need help?**:
+- Full agent guide: [AGENTS.md](AGENTS.md)
+- Workflow details: [.github/instructions/spec-driven-workflow.instructions.md](.github/instructions/spec-driven-workflow.instructions.md)
+- Coding standards: [.github/instructions/](.github/instructions/)
 
 ---
 
-**Last Updated**: February 2026
-**Project Type**: Full-stack monorepo (Django + Angular + Playwright)
-**Methodology**: Specification-Driven Development (SDD)
+**Workflow Philosophy**: Plan thoroughly, implement incrementally, validate continuously.
+
+---
+
+**Workflow Philosophy**: Plan thoroughly, implement incrementally, validate continuously.
+
+**For Technical Details**: See [AGENTS.md](AGENTS.md) for project setup, architecture, tech stack, and development environment.
