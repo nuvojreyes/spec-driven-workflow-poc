@@ -9,30 +9,75 @@ applyTo: "**"
 
 ## Core Artifacts
 
-All agents must maintain and reference these three artifacts:
-
-- **`requirements.md`**: User stories and acceptance criteria in EARS notation (created by Product Agent)
+- **Jira Ticket**: Primary source of truth for feature requirements (accessed via Jira MCP)
 - **`technical-design.md`**: Technical architecture and implementation strategy (created by Architect Agent)
-- **`tasks.md`**: Detailed implementation plan with task breakdown (created by Architect Agent)
+- **`tasks.md`**: Detailed implementation plan with atomic task breakdown (created by Tasks Agent)
 
-## File Organization Strategy
+## Workflow Phases
 
-To prevent file conflicts and maintain a clear history of features, all spec artifacts are organized by JIRA ticket:
+### Phase 1: DESIGN (Architect Agent)
+1. Fetch Jira ticket via MCP
+2. Analyze codebase and constraints
+3. Create technical-design.md
+4. **MANDATORY: Devils Advocate self-critique**
+5. Refine design based on critique
+6. Hand off to Tasks Agent
+
+### Phase 2: PLAN (Tasks Agent)
+1. Read technical-design.md + Jira ticket
+2. Create atomic task breakdown in tasks.md
+3. **MANDATORY: Devils Advocate self-critique**
+4. Refine tasks based on critique
+5. **REQUEST APPROVAL (SINGLE GATE)**
+
+### Phase 3: IMPLEMENT (Backend/Frontend Agents)
+1. Read: Jira + technical-design.md + tasks.md
+2. Execute ONE atomic task at a time
+3. Request approval before each task
+4. Update tasks.md checklist after completion
+5. After ALL tasks complete: **MANDATORY: Devils Advocate review**
+
+### Phase 4: COMPLETE
+1. All tasks verified complete
+2. Tests passing
+3. PR created
+
+## Single Approval Gate
+
+| **Gate** | **Agent** | **Artifact** | **When** |
+|----------|-----------|--------------|----------|
+| Gate 1 | Tasks Agent | `tasks.md` | After implementation plan complete |
+
+## Devils Advocate Protocol (Mandatory)
+
+Devils Advocate is **mandatory** at these points:
+
+1. **After technical-design.md** (Architect Agent)
+   - Challenge architecture decisions
+   - Identify security/performance risks
+   - Document how concerns were addressed
+
+2. **After tasks.md** (Tasks Agent)
+   - Validate task completeness
+   - Check for circular dependencies
+   - Verify estimates are realistic
+
+3. **After all implementation tasks complete** (Implementation Agents)
+   - Review implementation against design
+   - Identify technical debt introduced
+   - Validate all acceptance criteria met
+
+## File Organization
 
 ```
 specs/
 ├── jira-tickets/
 │   ├── PROJ-123-feature-name/
-│   │   ├── requirements.md
 │   │   ├── technical-design.md
 │   │   ├── tasks.md
 │   │   └── .archive/
-│   │       ├── requirements-v1-YYYY-MM-DD.md
-│   │       └── technical-design-v1-YYYY-MM-DD.md
-│   └── PROJ-456-another-feature/
-│       └── ...
+│   └── ...
 └── templates/
-    ├── requirements.template.md
     ├── technical-design.template.md
     └── tasks.template.md
 ```
@@ -42,7 +87,7 @@ specs/
 1. **JIRA Ticket Folders** (`specs/jira-tickets/<TICKET-ID>/`)
    - One folder per JIRA ticket (feature or epic)
    - Naming convention: `<JIRA-ID>-<brief-description>` (e.g., `PROJ-123-weather-search`)
-   - Contains the three core artifacts for that ticket
+   - Contains technical-design.md and tasks.md
    - `.archive/` subfolder for versioned iterations
    - The ticket context is determined by the git branch name (e.g., `feature/PROJ-123-weather-search`)
 
@@ -51,61 +96,54 @@ specs/
    - Ensures consistency across tickets
    - Version controlled
 
-### Workflow Integration
+## Agent Handoff Protocol
 
-**Automated by Agents:**
+1. **Architect Agent → Tasks Agent**
+   - Trigger: technical-design.md complete + Devils Advocate applied
+   - Handoff: Tasks Agent reads technical-design.md
 
-The creation of the directory structure and copying of templates is **automated by the Product and Architect agents**. Human developers do not need to run these commands manually.
+2. **Tasks Agent → Implementation Agents**
+   - Trigger: tasks.md approved by user (single gate)
+   - Handoff: Implementation agents read all artifacts
 
-**Product Agent Responsibilities:**
+3. **Implementation Agents → User**
+   - Trigger: All tasks complete + Devils Advocate review + tests pass
+   - Handoff: PR submitted
 
-1. Extract ticket ID from current git branch
-2. Create ticket directory structure
-3. Copy requirements template
-4. Create requirements.md
+## QA Testing (Separate Workflow)
 
-```bash
-# Commands executed automatically by Product Agent:
-TICKET_ID=$(git branch --show-current | sed 's/feature\///')
-mkdir -p specs/jira-tickets/$TICKET_ID/.archive
-cp specs/templates/requirements.template.md specs/jira-tickets/$TICKET_ID/requirements.md
+QA operates **independently** from the main development workflow:
+
+### Test Automation Work
+- QA has dedicated Jira tickets for automation (e.g., "Add E2E tests for feature X")
+- These tickets follow the same spec-driven pattern with their own:
+  - technical-design.md (test architecture)
+  - tasks.md (test implementation tasks)
+- QA Agent works on these tickets using the same atomic task approach
+
+### Manual Validation
+- QA manually validates completed development work
+- This happens outside the automated workflow
+- Results communicated via Jira comments/status
+
+### Relationship to Dev Workflow
+```
+┌────────────────────────────────────┐     ┌────────────────────────────────────┐
+│    MAIN DEV WORKFLOW               │     │    QA AUTOMATION WORKFLOW          │
+│                                    │     │                                    │
+│ Jira (feature) → Architect →       │     │ Jira (test) → Architect →          │
+│ Tasks Agent → Backend/Frontend     │     │ Tasks Agent → QA Agent             │
+│           ↓                        │     │           ↓                        │
+│    PR Ready                        │ ──► │  Manual QA Validation              │
+│                                    │     │           ↓                        │
+│                                    │     │  Approved / Feedback               │
+└────────────────────────────────────┘     └────────────────────────────────────┘
 ```
 
-**Architect Agent Responsibilities:**
-
-1. Verify ticket directory exists (create if missing)
-2. Copy technical-design and tasks templates
-3. Create technical-design.md
-4. Create tasks.md
-
-```bash
-# Commands executed automatically by Architect Agent:
-TICKET_ID=$(git branch --show-current | sed 's/feature\///')
-cp specs/templates/technical-design.template.md specs/jira-tickets/$TICKET_ID/technical-design.md
-cp specs/templates/tasks.template.md specs/jira-tickets/$TICKET_ID/tasks.md
-```
-
-**Implementation Agent Responsibilities:**
-
-- Read specs from `specs/jira-tickets/<TICKET-ID>/`
-- Update task status in `tasks.md`
-- Do NOT create new spec files
-
-**When archiving a revision (any agent):**
-
-```bash
-# Archive current version before major revision
-TICKET_ID=$(git branch --show-current | sed 's/feature\///')
-cp specs/jira-tickets/$TICKET_ID/requirements.md \
-   specs/jira-tickets/$TICKET_ID/.archive/requirements-v1-$(date +%Y-%m-%d).md
-```
-
-**Agent File References:**
-
-- Agents determine the ticket ID from the current git branch name
-- Agents read/write to `specs/jira-tickets/<TICKET-ID>/<artifact>.md`
-- The git branch provides the context (e.g., `feature/PROJ-123-weather-search`)
-- When revising, agents should archive previous version to `.archive/` before updating
+QA Agent does NOT:
+- Block the main development workflow
+- Define tasks for development tickets
+- Receive automatic handoff from implementation agents
 
 ## EARS Notation (Requirement Standard)
 
@@ -118,129 +156,44 @@ cp specs/jira-tickets/$TICKET_ID/requirements.md \
 - **Optional**: `WHERE [feature is included] THE SYSTEM SHALL [expected behavior]`
 - **Complex**: Combinations of the above patterns
 
-**Example**:
+## Approval Request Template
+
+**Tasks Agent (Single Gate):**
 
 ```markdown
-REQ-001: Weather Search
-WHEN a user enters a city name and clicks "Search",
-THE SYSTEM SHALL retrieve and display weather data within 2 seconds.
+## Approval Request: Implementation Plan
 
-Acceptance Criteria:
+I've created the implementation plan for ticket [TICKET-ID].
 
-- [ ] City name validated before API call
-- [ ] Loading indicator shown during fetch
-- [ ] Results display temperature, conditions, humidity
-- [ ] Error message shown if city not found
-```
+**Location**: `specs/jira-tickets/[TICKET-ID]/tasks.md`
 
-**Requirements Quality Criteria**:
+**Summary**:
+- Total tasks: [N]
+- Estimated effort: [X hours/days]
+- Phases: [List phases]
 
-- **Testable**: Can be verified through automated or manual testing
-- **Unambiguous**: Single interpretation possible
-- **Necessary**: Contributes to the system's purpose
-- **Feasible**: Can be implemented within constraints
-- **Traceable**: Linked to user needs and design elements
+**Task Overview**:
+1. TASK-001: [Title] - [Effort]
+2. TASK-002: [Title] - [Effort]
+...
 
-## Approval Gates
-
-Three critical approval gates exist in the workflow:
-
-| **Gate** | **Agent**       | **Artifact**          | **When**                             |
-| -------- | --------------- | --------------------- | ------------------------------------ |
-| Gate 1   | Product Agent   | `requirements.md`     | After requirements analysis complete |
-| Gate 2   | Architect Agent | `technical-design.md` | After technical design complete      |
-| Gate 3   | Architect Agent | `tasks.md`            | After implementation plan complete   |
-
-### Approval Request Template
-
-```markdown
-## Approval Request: [artifact name]
-
-I've completed [requirements.md / technical-design.md / tasks.md] for ticket [JIRA-TICKET-ID].
-
-**Location**: `specs/jira-tickets/[JIRA-TICKET-ID]/[artifact-name].md`
-**Key Decisions**:
-
-- [Decision 1 with rationale]
-- [Decision 2 with rationale]
+**Dependencies**: [Key dependencies]
 
 **Risks Identified**:
+- [Risk 1]: Mitigation: [Strategy]
 
-- [Risk 1]: [Description] - Mitigation: [Strategy]
+**Devils Advocate Applied**: Yes - [Key concerns addressed]
 
-**Confidence Score**: [0-100%] - [Rationale]
-
-**Next Steps** (if approved): [What happens next]
-
-**Questions for Review**: [Specific areas needing feedback]
-
-Please review and approve to proceed.
+Please review and approve to proceed to implementation.
 ```
 
 ### User Response Options
 
-- ✅ **Approved** → Agent proceeds to next phase
-- 🔄 **Revise** → Agent updates artifact based on feedback and resubmits
-- ❌ **Reject** → Agent returns to previous phase
+- ✅ **Approved** → Implementation agents proceed
+- 🔄 **Revise** → Tasks Agent updates and resubmits
+- ❌ **Reject** → Return to Architect Agent
 
-## Devils Advocate Protocol
-
-### Built-in Self-Critique (Product & Architect Agents)
-
-**Product Agent** - Before presenting `requirements.md`:
-
-- "What scenarios are missing from requirements?"
-- "Is this requirement ambiguous or unclear?"
-- "What unusual inputs or edge cases could break this?"
-- "Can we write automated tests to validate this?"
-- "What are we assuming that might not be true?"
-- "What happens if external dependencies fail?"
-
-**Architect Agent** - Before presenting `technical-design.md`:
-
-- "Why did we choose this approach over alternatives?"
-- "What could go wrong with this design?"
-- "Will this architecture handle 10x growth?"
-- "Where are the security vulnerabilities?"
-- "Are there performance bottlenecks?"
-- "What edge cases did we miss in the design?"
-
-**Architect Agent** - Before presenting `tasks.md`:
-
-- "Are there circular dependencies?"
-- "Are estimates realistic or optimistic?"
-- "What tasks are missing?"
-- "Which tasks are high-risk?"
-- "Can these tasks be completed independently?"
-
-### Optional Devils Advocate Invocation (Implementation Agents)
-
-Implementation agents can invoke the **standalone Devils Advocate agent** when:
-
-- Uncertain about technical approach
-- Facing complex architectural decision
-- Need validation of implementation strategy
-- Want critical analysis of design choice
-
-**How to invoke**: Present decision and request: "Act as Devils Advocate and challenge this approach"
-
-## Agent Handoff Protocol
-
-### Phase Transitions
-
-1. **Product Agent → Architect Agent**
-   - **Trigger**: `requirements.md` approved by user
-   - **Handoff**: Product Agent notifies completion, Architect Agent reads `requirements.md`
-
-2. **Architect Agent → Implementation Agents**
-   - **Trigger**: Both `technical-design.md` and `tasks.md` approved by user
-   - **Handoff**: Architect Agent notifies completion, Implementation Agents read all three spec files
-
-3. **Implementation Agents → User**
-   - **Trigger**: All tasks complete, tests pass, PR created
-   - **Handoff**: PR submitted following `git-workflow.instructions.md`
-
-### Confidence Score Strategy
+## Confidence Score Strategy
 
 When creating `technical-design.md`, Architect Agent assesses confidence (0-100%):
 
@@ -254,7 +207,7 @@ When encountering errors or blockers:
 
 1. **Re-analyze**: Revisit requirements, ask clarifying questions
 2. **Re-design**: Update `technical-design.md` or `tasks.md`, request re-approval if significant
-3. **Invoke Devils Advocate**: Get critique on approach (implementation agents)
+3. **Invoke Devils Advocate**: Get critique on approach
 4. **Escalate**: Provide context, what was tried, what's blocking
 
 **Critical Rule**: Never proceed with unresolved errors or ambiguities.

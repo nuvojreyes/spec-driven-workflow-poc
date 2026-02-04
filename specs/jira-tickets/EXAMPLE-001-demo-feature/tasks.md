@@ -1,246 +1,64 @@
-# Implementation Tasks: EXAMPLE-001-demo-feature
+# Implementation Tasks: EXAMPLE-001 (Simplified, Atomic)
 
-**Feature ID**: [PROJ-XXX]  
-**Created**: 2026-01-29  
-**Owner**: Architect Agent  
-**Status**: Draft | In Review | Approved | In Progress | Complete
-
----
-
-## Task Overview
-
-### Summary
-
-[Brief description of the implementation plan]
-
-### Estimation
-
-- **Total Effort**: [X] hours/days
-- **Developer Count**: [N] developers
-- **Timeline**: [Start Date] to [End Date]
-
-### Dependencies Graph
-
-```
-Task 1 → Task 2 → Task 5
-      ↘ Task 3 → Task 6
-Task 4 ────────↗
-```
+**Feature ID**: EXAMPLE-001
+**Created**: 2026-01-29
+**Owner**: Architect Agent
+**Status**: Draft
 
 ---
 
-## Phase 1: Foundation
-
-### TASK-001: [Task Title]
-
-**Status**: Not Started | In Progress | Blocked | Complete
-
-**Priority**: High | Medium | Low  
-**Effort**: [X] hours  
-**Assignee**: Backend | Frontend | QA | DevOps
-
-**Description**:
-
-[Detailed description of what needs to be done]
-
-**Acceptance Criteria**:
-
-- [ ] Criterion 1
-- [ ] Criterion 2
-- [ ] Criterion 3
-
-**Dependencies**:
-
-- None (or list of task IDs)
-
-**Files to Modify**:
-
-- `path/to/file1.py`
-- `path/to/file2.ts`
-
-**Test Coverage**:
-
-- [ ] Unit tests for [component]
-- [ ] Integration tests for [feature]
-
-**Notes**:
-
-[Any additional context or considerations]
+Purpose: concise, actionable, atomic checklist steps. Each checklist item should be a single developer action (15–240 minutes). Agents must request explicit human approval before toggling checklist items.
 
 ---
 
-### TASK-002: [Task Title]
+### TASK-001: Setup example model and migration
 
-**Status**: Not Started | In Progress | Blocked | Complete
+- [ ] Add model `ExampleItem` to `backend/api/models.py` with minimal fields.
+- [ ] Run `python manage.py makemigrations` and commit migration file.
+- [ ] Run `python manage.py migrate` and verify DB table exists.
+- [ ] Add unit test that creates and retrieves `ExampleItem`.
 
-**Priority**: High | Medium | Low  
-**Effort**: [X] hours  
-**Assignee**: Backend | Frontend | QA | DevOps
-
-**Description**:
-
-[Detailed description of what needs to be done]
-
-**Acceptance Criteria**:
-
-- [ ] Criterion 1
-- [ ] Criterion 2
-
-**Dependencies**:
-
-- TASK-001
-
-**Files to Modify**:
-
-- `path/to/file3.py`
-
-**Test Coverage**:
-
-- [ ] Unit tests for [component]
+Acceptance: migration present, DB table exists, unit test passes.
 
 ---
 
-## Phase 2: Core Implementation
+### TASK-002: Create example API endpoint
 
-### TASK-003: [Task Title]
+- [ ] Add GET `/api/example` endpoint in `backend/api/views.py` returning sample JSON.
+- [ ] Add serializer/validator for request params if needed.
+- [ ] Add unit tests for success and invalid input.
 
-[Same structure as above]
-
----
-
-### TASK-004: [Task Title]
-
-[Same structure as above]
+Acceptance: endpoint responds correctly and tests pass.
 
 ---
 
-## Phase 3: Integration & Testing
+### TASK-003: Frontend example component
 
-### TASK-005: [Task Title]
+- [ ] Add `ExampleComponent` with basic UI and call to `/api/example`.
+- [ ] Add unit tests for component interaction.
 
-[Same structure as above]
-
----
-
-### TASK-006: [Task Title]
-
-[Same structure as above]
+Acceptance: component renders and fetches data in tests.
 
 ---
 
-## Phase 4: Documentation & Deployment
+### TASK-004: Integration test
 
-### TASK-007: Update Documentation
+- [ ] Add simple integration test that exercises backend endpoint and frontend component (mock API or run backend).
 
-**Status**: Not Started
-
-**Priority**: Medium  
-**Effort**: 2 hours  
-**Assignee**: All
-
-**Description**:
-
-Update all relevant documentation to reflect the new feature.
-
-**Acceptance Criteria**:
-
-- [ ] README.md updated
-- [ ] API documentation updated
-- [ ] User guide updated (if applicable)
-- [ ] Architecture diagrams updated
-
-**Files to Modify**:
-
-- `README.md`
-- `docs/api.md`
-- `AGENTS.md` (if needed)
+Acceptance: integration test included and documented.
 
 ---
 
-### TASK-008: Prepare Deployment
+### TASK-005: Documentation
 
-**Status**: Not Started
+- [ ] Add short README in the ticket folder with run instructions and necessary env vars.
 
-**Priority**: High  
-**Effort**: 3 hours  
-**Assignee**: DevOps
-
-**Description**:
-
-Prepare deployment artifacts and configuration.
-
-**Acceptance Criteria**:
-
-- [ ] Database migrations created and tested
-- [ ] Environment variables documented
-- [ ] Deployment checklist created
-- [ ] Rollback plan documented
-
-**Dependencies**:
-
-- All previous tasks complete
+Acceptance: README added.
 
 ---
 
-## Risk Register
+### TASK-006: Final review & PR
 
-### High-Risk Tasks
+- [ ] Run tests, create PR, request review, and merge after approvals.
 
-| Task ID  | Risk Description | Mitigation Strategy |
-| -------- | ---------------- | ------------------- |
-| TASK-XXX | [Risk]           | [Mitigation]        |
-| TASK-YYY | [Risk]           | [Mitigation]        |
-
----
-
-## Progress Tracking
-
-### Overall Progress
-
-- [ ] Phase 1: Foundation (0/2 tasks)
-- [ ] Phase 2: Core Implementation (0/2 tasks)
-- [ ] Phase 3: Integration & Testing (0/2 tasks)
-- [ ] Phase 4: Documentation & Deployment (0/2 tasks)
-
-**Overall**: 0/8 tasks complete (0%)
-
-### Blockers
-
-[List any current blockers]
-
-### Changes from Original Plan
-
-[Document any deviations from the original design]
-
----
-
-## Definition of Done
-
-Before marking this feature complete, ensure:
-
-- [ ] All tasks marked as Complete
-- [ ] All acceptance criteria met
-- [ ] All tests passing (unit, integration, E2E)
-- [ ] Code reviewed and approved
-- [ ] Documentation updated
-- [ ] No critical bugs
-- [ ] Security review passed
-- [ ] Performance benchmarks met
-- [ ] Deployed to staging and validated
-- [ ] User acceptance testing complete
-
----
-
-## Approval
-
-**Submitted by**: [Agent/Person]  
-**Submitted on**: [Date]  
-**Reviewed by**: [User]  
-**Approval Status**: Pending | Approved | Rejected  
-**Approval Date**: [Date]
-
-**Review Notes**:
-
-[Feedback from reviewer]
-
-**Completion Date**: [Date when all tasks done]
+Acceptance: PR created and merged; tasks marked complete.
