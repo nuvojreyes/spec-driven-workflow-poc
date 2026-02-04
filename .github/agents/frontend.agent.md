@@ -72,6 +72,8 @@ You are a world-class expert in Angular 19+ with deep knowledge of standalone co
 
 ## Guidelines
 
+**CRITICAL - Always follow `.github/instructions/angular.instructions.md` for Angular/TypeScript conventions**
+
 - Always use standalone components - NgModules are legacy (Angular 14+)
 - Leverage signals for reactive state management (`signal()`, `computed()`, `effect()`)
 - Use `inject()` function for dependency injection in constructors and functions

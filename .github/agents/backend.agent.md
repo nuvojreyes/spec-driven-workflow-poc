@@ -120,7 +120,6 @@ Notes and constraints:
 
 - Treat each task as self-contained; do not bundle multiple tasks into a single change unless the user explicitly approves bundling.
 - Always archive or update `tasks.md` status if tasks are completed or moved; record progress back to `tasks.md` or the agreed tracking artifact.
-- Always archive or update `tasks.md` status if tasks are completed or moved; record progress back to `tasks.md` or the agreed tracking artifact.
 - When marking implementation progress, update the `Implementation Steps` checklist in `tasks.md` by toggling the specific item from `- [ ]` to `- [x]` for completed steps and commit the change. Report which checklist items were marked in the task report.
 - For potentially risky infra or database migrations, explicitly warn the user about rollback strategies and require explicit approval before applying disruptive changes.
 
