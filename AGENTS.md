@@ -52,22 +52,23 @@ This project follows a **Specification-Driven Development Workflow**. Before imp
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  ANALYZE (Product Agent)                                    │
-│  Create requirements.md with EARS notation                  │
-│  Gate 1: User approves requirements                         │
-└────────────────────────┬────────────────────────────────────┘
-                         ▼
-┌─────────────────────────────────────────────────────────────┐
 │  DESIGN (Architect Agent)                                   │
-│  Create technical-design.md and tasks.md                    │
-│  Gate 2: User approves design                               │
-│  Gate 3: User approves implementation plan                  │
+│  Fetch Jira ticket → Create technical-design.md             │
+│  MANDATORY: Devils Advocate self-critique                   │
 └────────────────────────┬────────────────────────────────────┘
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  IMPLEMENT (Backend/Frontend/QA Agents)                     │
-│  Write code following tasks.md                              │
-│  Create tests verifying requirements.md                     │
+│  PLAN (Tasks Agent)                                         │
+│  Read technical-design.md → Create tasks.md                 │
+│  MANDATORY: Devils Advocate self-critique                   │
+│  Gate: User approves implementation plan                    │
+└────────────────────────┬────────────────────────────────────┘
+                         ▼
+┌─────────────────────────────────────────────────────────────┐
+│  IMPLEMENT (Backend/Frontend Agents)                        │
+│  Execute tasks one at a time from tasks.md                  │
+│  Update tasks.md checklist after each completion            │
+│  MANDATORY: Devils Advocate review after ALL tasks          │
 └────────────────────────┬────────────────────────────────────┘
                          ▼
 ┌─────────────────────────────────────────────────────────────┐
@@ -78,11 +79,11 @@ This project follows a **Specification-Driven Development Workflow**. Before imp
 
 ### Core Artifacts
 
-All feature development maintains these three files in the `specs/` directory:
+All feature development maintains these files in the `specs/` directory:
 
-- **`requirements.md`**: User stories and acceptance criteria in EARS notation
-- **`technical-design.md`**: Architecture, tech stack, data models, API contracts
-- **`tasks.md`**: Detailed implementation plan with atomic, trackable tasks
+- **Jira Ticket**: Primary source of truth for feature requirements (accessed via Jira MCP)
+- **`technical-design.md`**: Technical architecture and implementation strategy (created by Architect Agent)
+- **`tasks.md`**: Detailed implementation plan with atomic task breakdown (created by Tasks Agent)
 
 **File Organization**: Each JIRA ticket has its own directory under `specs/jira-tickets/<TICKET-ID>/`. The ticket context is determined by the git branch name (e.g., `feature/PROJ-123-weather-search`). See `specs/README.md` for details.
 
@@ -114,8 +115,8 @@ Located in `.github/agents/`:
 
 | Agent               | Role                           | Primary Responsibility                               |
 | ------------------- | ------------------------------ | ---------------------------------------------------- |
-| **Product**         | Requirements Analysis          | Create `requirements.md`, define acceptance criteria |
-| **Architect**       | Technical Design               | Create `technical-design.md` and `tasks.md`          |
+| **Architect**       | Technical Design               | Create `technical-design.md`                         |
+| **Tasks**           | Implementation Planning        | Create `tasks.md` with atomic task breakdown         |
 | **Backend**         | Django/Python Development      | Implement backend features per `tasks.md`            |
 | **Frontend**        | Angular/TypeScript Development | Implement frontend features per `tasks.md`           |
 | **QA**              | Testing & Quality              | Create E2E tests, validate requirements              |
@@ -124,8 +125,8 @@ Located in `.github/agents/`:
 
 ### When to Use Which Agent
 
-- **Starting a new feature?** → Product Agent (`product.agent.md`)
-- **Need technical design?** → Architect Agent (`architect.agent.md`)
+- **Starting a new feature?** → Architect Agent (`architect.agent.md`) - fetches Jira ticket and creates technical design
+- **Need implementation plan?** → Tasks Agent (`tasks.agent.md`) - creates atomic task breakdown
 - **Implementing backend API?** → Backend Agent (`backend.agent.md`)
 - **Building UI components?** → Frontend Agent (`frontend.agent.md`)
 - **Writing tests?** → QA Agent (`qa.agent.md`)
@@ -138,20 +139,19 @@ Quick-start prompts in `.github/prompts/`:
 
 | Prompt                           | Purpose                             | Invokes                  |
 | -------------------------------- | ----------------------------------- | ------------------------ |
-| `analyze-requirements.prompt.md` | Start requirements analysis         | Product Agent workflow   |
 | `design-solution.prompt.md`      | Create technical design & tasks     | Architect Agent workflow |
 | `devils-advocate.prompt.md`      | Get critical analysis               | Devils Advocate agent    |
 | `review-pr.prompt.md`            | Review pull request                 | PR review checklist      |
-| `generate-tests.prompt.md`       | Create test suite from requirements | Test generation          |
+| `generate-tests.prompt.md`       | Create test suite from Jira ticket  | Test generation          |
 | `refactor-code.prompt.md`        | Improve code quality                | Refactoring patterns     |
 | `sync-documentation.prompt.md`   | Update all documentation            | Doc synchronization      |
 | `conventional-commit.prompt.md`  | Generate commit message             | Git workflow             |
 
 ### How to Use Prompts
 
-1. **Invoke via chat**: "@workspace use analyze-requirements prompt"
+1. **Invoke via chat**: "@workspace use design-solution prompt"
 2. **Follow the workflow**: Prompts guide you through each phase
-3. **Submit for approval**: Artifacts require user approval at gates
+3. **Submit for approval**: Single approval gate after tasks.md
 
 ## Setup Commands
 

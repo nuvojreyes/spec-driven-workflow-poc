@@ -85,28 +85,32 @@ This project follows a **Spec-Driven Development (SDD)** methodology where all f
 
 ```
 ┌──────────────────┐
-│  Product Agent   │ ← Phase 0-1: GATHER & ANALYZE
-│  (Requirements)  │    Creates: requirements.md (EARS notation)
-└────────┬─────────┘
-         ↓ [APPROVAL GATE 1]
+│ Architect Agent  │ ← Phase 1: DESIGN
+│  (Design)        │    Creates: technical-design.md
+│                  │    MANDATORY: Devils Advocate
+└───────┬───────────┘
+         ↓
 ┌──────────────────┐
-│ Architect Agent  │ ← Phase 2: DESIGN
-│  (Design/Tasks)  │    Creates: technical-design.md + tasks.md
-└────────┬─────────┘
-         ↓ [APPROVAL GATES 2 & 3]
+│   Tasks Agent    │ ← Phase 2: PLAN
+│    (Tasks)       │    Creates: tasks.md
+│                  │    MANDATORY: Devils Advocate
+└───────┬───────────┘
+         ↓ [SINGLE APPROVAL GATE]
 ┌──────────────────┐
-│  Implementation  │ ← Phase 3-5: IMPLEMENT, VALIDATE, REFLECT
-│   (Dev Agents)   │    Backend, Frontend, QA agents
+│ Implementation   │ ← Phase 3-5: IMPLEMENT, VALIDATE, REFLECT
+│   (Dev Agents)   │    Backend, Frontend agents
+│                  │    MANDATORY: Devils Advocate after ALL tasks
 └──────────────────┘
 ```
 
 ### Core Artifacts
 
-Every feature maintains three key documents in `specs/jira-tickets/<TICKET-ID>/`:
+Every feature maintains two key documents in `specs/jira-tickets/<TICKET-ID>/`:
 
-1. **requirements.md** - User stories and acceptance criteria in EARS notation
-2. **technical-design.md** - Architecture, data models, API contracts
-3. **tasks.md** - Detailed implementation plan with atomic tasks
+1. **technical-design.md** - Architecture, data models, API contracts (created by Architect Agent)
+2. **tasks.md** - Detailed implementation plan with atomic tasks (created by Tasks Agent)
+
+**Note**: Jira tickets serve as the primary source of requirements. No separate requirements.md file is needed.
 
 ### EARS Notation
 
@@ -134,18 +138,18 @@ Located in `.github/agents/`:
 
 | Agent               | Role                      | Primary Responsibility                    |
 | ------------------- | ------------------------- | ----------------------------------------- |
-| **Product**         | Requirements Analysis     | Create requirements.md with EARS notation |
-| **Architect**       | Technical Design          | Create technical-design.md and tasks.md   |
+| **Architect**       | Technical Design          | Create technical-design.md from Jira      |
+| **Tasks**           | Implementation Planning   | Create tasks.md with atomic task breakdown|
 | **Backend**         | Django/Python Development | Implement backend features per tasks.md   |
 | **Frontend**        | Angular Development       | Implement frontend features per tasks.md  |
-| **QA**              | Testing & Quality         | Create E2E tests, validate requirements   |
+| **QA**              | Testing & Quality         | Create E2E tests, validate Jira criteria  |
 | **DevOps**          | Infrastructure & CI/CD    | Docker, deployment, pipelines             |
 | **Devils Advocate** | Critical Analysis         | Challenge assumptions, find flaws         |
 
 ### When to Use Which Agent
 
-- **Starting a new feature?** → Product Agent (`.github/agents/product.agent.md`)
-- **Need technical design?** → Architect Agent (`.github/agents/architect.agent.md`)
+- **Starting a new feature?** → Architect Agent (`.github/agents/architect.agent.md`) - fetches Jira and creates design
+- **Need implementation plan?** → Tasks Agent (`.github/agents/tasks.agent.md`) - creates task breakdown
 - **Implementing backend API?** → Backend Agent (`.github/agents/backend.agent.md`)
 - **Building UI components?** → Frontend Agent (`.github/agents/frontend.agent.md`)
 - **Writing tests?** → QA Agent (`.github/agents/qa.agent.md`)
@@ -157,16 +161,16 @@ Located in `.github/agents/`:
 **Via GitHub Copilot or Claude:**
 
 ```
-@workspace use product agent to analyze WEATHER-001
-@workspace use architect agent to design the solution
+@workspace use architect agent for WEATHER-001
+@workspace use tasks agent to create implementation plan
 @workspace use backend agent to implement the API
 ```
 
 **Or invoke prompts directly:**
 
 ```
-@workspace use analyze-requirements prompt
 @workspace use design-solution prompt
+@workspace use devils-advocate prompt
 ```
 
 See `.github/prompts/` for all available prompts.
@@ -175,21 +179,22 @@ See `.github/prompts/` for all available prompts.
 
 ### 1. Feature Development Process
 
-**Step 1: Requirements (Product Agent)**
+**Step 1: Design (Architect Agent)**
 
 ```bash
-# User provides Jira ticket or feature request
-# Product Agent creates specs/jira-tickets/<TICKET-ID>/requirements.md
-# User approves requirements ✓
+# User provides Jira ticket ID
+# Architect Agent fetches Jira ticket via MCP
+# Creates technical-design.md
+# Applies mandatory Devils Advocate self-critique
 ```
 
-**Step 2: Design (Architect Agent)**
+**Step 2: Plan (Tasks Agent)**
 
 ```bash
-# Architect Agent creates technical-design.md
-# User approves design ✓
-# Architect Agent creates tasks.md
-# User approves implementation plan ✓
+# Tasks Agent reads technical-design.md
+# Creates tasks.md with atomic task breakdown
+# Applies mandatory Devils Advocate self-critique
+# User approves implementation plan ✓ (SINGLE APPROVAL GATE)
 ```
 
 **Step 3: Implementation (Dev Agents)**
@@ -200,12 +205,14 @@ git checkout -b feature/WEATHER-XXX-description
 
 # Backend Agent implements API
 # Frontend Agent implements UI
-# QA Agent creates tests
+# Each task requires approval before execution
 
 # Run tests continuously
 python backend/manage.py test
 cd frontend && npm test
 cd qa && npm test
+
+# After ALL tasks: mandatory Devils Advocate review
 ```
 
 **Step 4: Validation & Deployment**
@@ -302,7 +309,6 @@ sdd-ai-weather/
 ├── specs/              # Feature specifications
 │   └── jira-tickets/
 │       └── WEATHER-XXX/
-│           ├── requirements.md
 │           ├── technical-design.md
 │           └── tasks.md
 ├── .github/            # GitHub and AI agent configuration
@@ -372,7 +378,6 @@ Quick-start prompts in `.github/prompts/`:
 
 | Prompt                           | Purpose                       |
 | -------------------------------- | ----------------------------- |
-| `analyze-requirements.prompt.md` | Start requirements analysis   |
 | `design-solution.prompt.md`      | Create technical design       |
 | `devils-advocate.prompt.md`      | Get critical analysis         |
 | `review-pr.prompt.md`            | Review pull request           |
@@ -506,8 +511,8 @@ ng serve --port 4201
 ## Additional Resources
 
 - **Complete Agent Guide**: [AGENTS.md](AGENTS.md)
-- **SDD Workflow Details**: [.github/WORKFLOW.md](.github/WORKFLOW.md)
-- **Current Feature Spec**: [specs/jira-tickets/WEATHER-001-basic-city-weather-search/requirements.md](specs/jira-tickets/WEATHER-001-basic-city-weather-search/requirements.md)
+- **SDD Workflow Details**: [.github/instructions/spec-driven-workflow.instructions.md](.github/instructions/spec-driven-workflow.instructions.md)
+- **Current Feature Spec**: [specs/jira-tickets/WEATHER-001-basic-city-weather-search/technical-design.md](specs/jira-tickets/WEATHER-001-basic-city-weather-search/technical-design.md)
 
 ## Port Reference
 

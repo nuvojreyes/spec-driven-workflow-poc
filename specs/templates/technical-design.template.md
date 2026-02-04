@@ -8,7 +8,7 @@
 
 ---
 
-## Design Overview
+## Design Overview [REQUIRED]
 
 ### Objective
 
@@ -32,7 +32,7 @@
 
 ---
 
-## Architecture
+## Architecture [REQUIRED]
 
 ### System Components
 
@@ -63,7 +63,7 @@
 
 ---
 
-## Data Model
+## Data Model [IF-APPLICABLE]
 
 ### Database Schema
 
@@ -88,7 +88,7 @@
 
 ---
 
-## API Design
+## API Design [IF-APPLICABLE]
 
 ### Endpoint 1: [Method] /api/path
 
@@ -130,7 +130,7 @@
 
 ---
 
-## Security Considerations
+## Security Considerations [REQUIRED]
 
 ### Authentication & Authorization
 
@@ -150,7 +150,7 @@
 
 ---
 
-## Performance & Scalability
+## Performance & Scalability [IF-APPLICABLE]
 
 ### Performance Targets
 
@@ -173,7 +173,7 @@
 
 ---
 
-## Testing Strategy
+## Testing Strategy [REQUIRED]
 
 ### Unit Tests
 
@@ -193,7 +193,7 @@
 
 ---
 
-## Deployment Strategy
+## Deployment Strategy [IF-APPLICABLE]
 
 ### Environment Setup
 
@@ -209,7 +209,7 @@
 
 ---
 
-## Risks & Mitigations
+## Risks & Mitigations [REQUIRED]
 
 ### Risk 1: [Description]
 
@@ -225,14 +225,14 @@
 
 ---
 
-## Open Questions
+## Open Questions [IF-APPLICABLE]
 
 - [ ] Question 1: [What needs to be resolved]
 - [ ] Question 2: [What needs to be resolved]
 
 ---
 
-## Dependencies
+## Dependencies [IF-APPLICABLE]
 
 ### Technology Dependencies
 
@@ -246,7 +246,7 @@
 
 ---
 
-## Approval
+## Approval [REQUIRED]
 
 **Submitted by**: [Agent/Person]  
 **Submitted on**: [Date]  
