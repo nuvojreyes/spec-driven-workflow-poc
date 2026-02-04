@@ -6,10 +6,6 @@ This project uses a **Spec-Driven Development (SDD)** methodology where all feat
 
 The workflow transforms Jira tickets into implemented features through three phases with a single approval gate:
 
-## How the Workflow Works
-
-The workflow transforms Jira tickets into implemented features through three phases with a single approval gate:
-
 ### Phase 1: Design (Architect Agent)
 
 - **Input**: Jira ticket (fetched via MCP)
@@ -270,10 +266,6 @@ cd qa && npm test
 - Full agent guide: [AGENTS.md](AGENTS.md)
 - Workflow details: [.github/instructions/spec-driven-workflow.instructions.md](.github/instructions/spec-driven-workflow.instructions.md)
 - Coding standards: [.github/instructions/](.github/instructions/)
-
----
-
-**Workflow Philosophy**: Plan thoroughly, implement incrementally, validate continuously.
 
 ---
 
