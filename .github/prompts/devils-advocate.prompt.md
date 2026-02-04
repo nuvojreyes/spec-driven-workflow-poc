@@ -1,6 +1,6 @@
 ---
 description: "Invoke Devils Advocate agent to critically analyze designs, decisions, or implementations"
-agent: "devils-advocate"
+agent: "Devil's Advocate Agent"
 tools:
   [
     "search/codebase",
