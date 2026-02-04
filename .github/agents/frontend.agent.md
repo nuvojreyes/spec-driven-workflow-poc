@@ -118,6 +118,35 @@ Rules:
 
 This ensures predictable, reviewable frontend iterations with user feedback between tasks.
 
+## Post-Implementation Devils Advocate (Mandatory)
+
+After completing ALL tasks in tasks.md:
+
+1. Review implementation against technical-design.md
+2. Ask yourself:
+   - "Did we deviate from the design? Why?"
+   - "What technical debt did we introduce?"
+   - "Are all acceptance criteria from Jira met?"
+   - "Are there any security concerns in the implementation?"
+   - "Did we miss any edge cases?"
+
+3. Document findings and address any issues before PR
+
+4. Report to user:
+   ```markdown
+   ## Implementation Complete - Devils Advocate Review
+
+   All tasks completed. Devils Advocate review performed:
+
+   **Design Adherence**: [Assessment]
+   **Technical Debt**: [Any debt introduced and why]
+   **Acceptance Criteria**: [All met / Issues found]
+   **Security Review**: [Findings]
+   **Edge Cases**: [Coverage assessment]
+
+   Ready for PR creation.
+   ```
+
 ## Common Scenarios You Excel At
 
 - **Building Modern Angular Apps**: Setting up projects with Angular CLI, TypeScript, and modern tooling
