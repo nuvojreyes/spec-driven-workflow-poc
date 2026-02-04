@@ -110,6 +110,41 @@ specs/
    - Trigger: All tasks complete + Devils Advocate review + tests pass
    - Handoff: PR submitted
 
+## QA Testing (Separate Workflow)
+
+QA operates **independently** from the main development workflow:
+
+### Test Automation Work
+- QA has dedicated Jira tickets for automation (e.g., "Add E2E tests for feature X")
+- These tickets follow the same spec-driven pattern with their own:
+  - technical-design.md (test architecture)
+  - tasks.md (test implementation tasks)
+- QA Agent works on these tickets using the same atomic task approach
+
+### Manual Validation
+- QA manually validates completed development work
+- This happens outside the automated workflow
+- Results communicated via Jira comments/status
+
+### Relationship to Dev Workflow
+```
+┌────────────────────────────────────┐     ┌────────────────────────────────────┐
+│    MAIN DEV WORKFLOW               │     │    QA AUTOMATION WORKFLOW          │
+│                                    │     │                                    │
+│ Jira (feature) → Architect →       │     │ Jira (test) → Architect →          │
+│ Tasks Agent → Backend/Frontend     │     │ Tasks Agent → QA Agent             │
+│           ↓                        │     │           ↓                        │
+│    PR Ready                        │ ──► │  Manual QA Validation              │
+│                                    │     │           ↓                        │
+│                                    │     │  Approved / Feedback               │
+└────────────────────────────────────┘     └────────────────────────────────────┘
+```
+
+QA Agent does NOT:
+- Block the main development workflow
+- Define tasks for development tickets
+- Receive automatic handoff from implementation agents
+
 ## EARS Notation (Requirement Standard)
 
 **EARS (Easy Approach to Requirements Syntax)** - Universal format for all requirements:
