@@ -14,13 +14,14 @@ tools:
 
 # Generate Test Suite
 
-You are creating comprehensive tests based on `requirements.md`. Your goal is to ensure every requirement has corresponding automated tests that verify acceptance criteria.
+You are creating comprehensive tests based on Jira ticket acceptance criteria. Your goal is to ensure every requirement has corresponding automated tests that verify acceptance criteria.
 
 ## Prerequisites
 
-1. Read `requirements.md` - understand all requirements
+1. **Fetch Jira ticket via MCP** - understand all requirements and acceptance criteria
 2. Read `technical-design.md` - understand implementation approach
-3. Check existing test files - avoid duplication
+3. Read `tasks.md` - understand what was implemented
+4. Check existing test files - avoid duplication
 
 ## Test Types to Generate
 

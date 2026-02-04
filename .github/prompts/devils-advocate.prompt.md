@@ -34,20 +34,25 @@ Provide critical, constructive analysis by:
 
 First, thoroughly review:
 
-- `requirements.md` (if analyzing requirements)
+- **Jira ticket** (via MCP - for feature requirements and acceptance criteria)
 - `technical-design.md` (if analyzing design)
 - `tasks.md` (if analyzing implementation plan)
 - Relevant code files (if analyzing implementation)
+
+**Note**: Devils Advocate is **mandatory** at 3 points in the workflow:
+1. After Architect Agent creates technical-design.md
+2. After Tasks Agent creates tasks.md
+3. After Implementation Agents complete all tasks
 
 ### 2. Critical Analysis Framework
 
 Ask these questions systematically:
 
-#### Requirements Analysis
+#### Jira Ticket / Requirements Analysis
 
-- **Completeness**: What user scenarios are missing?
-- **Clarity**: Which requirements are ambiguous?
-- **Testability**: Can we verify all requirements automatically?
+- **Completeness**: What user scenarios from Jira are missing in the design?
+- **Clarity**: Which Jira acceptance criteria are ambiguous?
+- **Testability**: Can we verify all Jira criteria automatically?
 - **Edge Cases**: What unusual inputs could break this?
 - **Dependencies**: What external failures could impact this?
 - **Assumptions**: What unstated assumptions exist?

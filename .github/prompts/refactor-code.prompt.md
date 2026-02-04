@@ -20,7 +20,7 @@ You are refactoring code to improve quality, maintainability, or performance whi
 ## Refactoring Principles
 
 1. **Preserve Behavior**: All existing tests must pass after refactoring
-2. **Maintain Requirements**: All requirements in `requirements.md` must still be met
+2. **Maintain Requirements**: All Jira ticket acceptance criteria must still be met
 3. **Follow Standards**: Adhere to coding standards in `.github/instructions/`
 4. **Improve Quality**: Focus on readability, maintainability, performance, or security
 5. **Test Coverage**: Ensure refactored code has adequate test coverage
@@ -31,11 +31,12 @@ You are refactoring code to improve quality, maintainability, or performance whi
 
 Before refactoring:
 
-1. Read `requirements.md` - understand what must be preserved
+1. **Fetch Jira ticket via MCP** - understand what requirements must be preserved
 2. Read `technical-design.md` - understand intended architecture
-3. Review existing code and tests
-4. Identify code smells or improvement opportunities
-5. Run existing tests to establish baseline
+3. Read `tasks.md` - understand implementation approach
+4. Review existing code and tests
+5. Identify code smells or improvement opportunities
+6. Run existing tests to establish baseline
 
 ### Step 2: Plan Refactoring
 

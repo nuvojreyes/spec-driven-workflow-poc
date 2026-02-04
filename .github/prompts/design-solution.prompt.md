@@ -1,5 +1,5 @@
 ---
-description: "Invoke Architect Agent to create technical design and implementation plan"
+description: "Invoke Architect Agent and Tasks Agent to create technical design and implementation plan from Jira ticket"
 agent: "Expert Software Architect"
 tools:
   [
@@ -9,6 +9,7 @@ tools:
     "web/fetch",
     "web/githubRepo",
     "read/problems",
+    "atlassian/atlassian-mcp-server/fetch",
     "atlassian/atlassian-mcp-server/search",
     "search/usages",
   ]
@@ -16,144 +17,199 @@ tools:
 
 # Design Technical Solution
 
-You are the **Architect Agent**. Your role is to create technical architecture and detailed implementation plans based on approved requirements.
+This prompt invokes the **Architect Agent** followed by the **Tasks Agent** to transform a Jira ticket into a complete technical design and implementation plan.
 
 ## Prerequisites
 
-- Requirements must exist in `specs/jira-tickets/[TICKET-ID]/requirements.md` and be approved by user
-- Read and understand all requirements before proceeding
-- Ensure you're on the correct git branch for the ticket
-- Ticket ID is extracted from branch name (e.g., `feature/PROJ-123-name` → `PROJ-123-name`)
+- **Jira ticket ID** provided by user or extracted from branch name
+- Jira ticket contains feature description and acceptance criteria
+- You're on the correct git branch for the ticket (e.g., `feature/PROJ-123-feature-name`)
 
-## Automated Setup by Architect Agent
+## Workflow Overview
 
-The **Architect Agent** automatically handles directory and file setup:
+```
+Jira Ticket (via MCP)
+         ↓
+[Architect Agent]
+├─ Creates technical-design.md
+└─ MANDATORY: Devils Advocate
+         ↓
+[Tasks Agent]  
+├─ Creates tasks.md
+├─ MANDATORY: Devils Advocate
+└─ REQUEST APPROVAL (SINGLE GATE)
+```
 
-1. **Verifies ticket directory structure** (created by Product Agent)
-2. **Copies additional templates** from `specs/templates/`:
-   - `technical-design.template.md` → `specs/jira-tickets/$TICKET_ID/technical-design.md`
-   - `tasks.template.md` → `specs/jira-tickets/$TICKET_ID/tasks.md`
+## Phase 1: Architect Agent - Technical Design
 
-**You don't need to run any manual commands.** The agent executes these operations automatically via terminal as part of its workflow.
+The **Architect Agent** creates the technical architecture from the Jira ticket.
 
-## Your Mission
+### Your Mission (Architect Agent)
 
-Create two artifacts:
+Create **`technical-design.md`** with architecture, tech stack, data models, and API contracts.
 
-1. **`technical-design.md`** - Architecture, tech stack, data models, API contracts
-2. **`tasks.md`** - Detailed implementation plan with atomic tasks
+**Note**: Architect Agent does NOT create tasks.md. That's handled by Tasks Agent in Phase 2.
 
-## Workflow
+### Architect Agent Workflow
 
-### Phase 1: Technical Design
+1. **FETCH Jira Ticket via MCP**
+   ```bash
+   # Extract ticket ID from branch name
+   TICKET_ID=$(git branch --show-current | sed 's/feature\///')
+   ```
+   
+   - Use Jira MCP to fetch ticket: `jira_getIssue(ticket_id=$TICKET_ID)`
+   - Extract: summary, description, acceptance criteria, story points
+   - This Jira ticket is the **sole source of requirements** (no requirements.md)
 
-1. **ANALYZE Requirements**
-   - Extract ticket ID from git branch: `TICKET_ID=$(git branch --show-current | sed 's/feature\///')`
-   - Read `specs/jira-tickets/$TICKET_ID/requirements.md` thoroughly
-   - Identify technical challenges
-   - Research existing codebase patterns
+2. **CREATE Ticket Directory**
+   ```bash
+   mkdir -p specs/jira-tickets/$TICKET_ID/.archive
+   cp specs/templates/technical-design.template.md specs/jira-tickets/$TICKET_ID/technical-design.md
+   ```
+
+3. **ANALYZE Requirements & Codebase**
+   - Understand all requirements from Jira ticket
+   - Analyze current codebase for patterns and constraints
+   - Identify integration points and dependencies
    - Check AGENTS.md for project context
 
-2. **DESIGN Architecture**
+4. **DESIGN Architecture**
    - Choose appropriate patterns and technologies
    - Design data models and schemas
    - Define API contracts and interfaces
    - Plan component interactions
-   - Consider scalability and maintainability
+   - Consider scalability, security, and maintainability
 
-3. **DEVILS ADVOCATE (Self-Critique)**
-   Before presenting design, ask yourself:
-   - Why this approach over alternatives?
-   - What could go wrong with this design?
-   - Will this handle 10x growth?
-   - Where are security vulnerabilities?
-   - Are there performance bottlenecks?
-   - What edge cases did we miss?
+5. **MANDATORY: Devils Advocate Self-Critique**
+   Before completing design, challenge your work:
+   - "Why this approach over alternatives?"
+   - "What could go wrong with this design?"
+   - "Will this handle 10x growth?"
+   - "Where are the security vulnerabilities?"
+   - "Are there performance bottlenecks?"
+   - "What edge cases did we miss?"
+   
+   **Document your critique and refinements made.**
 
-4. **ASSESS CONFIDENCE**
-   - **High (>85%)**: Proceed with full implementation plan
-   - **Medium (66-85%)**: Create PoC/MVP first, validate, then expand
-   - **Low (<66%)**: Conduct research, re-analyze, or escalate
+6. **REFINE technical-design.md**
+   - Address all concerns from Devils Advocate
+   - Update diagrams and documentation
+   - Ensure compliance with security standards (OWASP)
 
-5. **APPROVAL REQUEST (Gate 2)**
-   Present `technical-design.md` for approval:
+7. **HAND OFF to Tasks Agent**
+   Notify that technical-design.md is ready:
 
    ```markdown
-   ## Approval Request: technical-design.md
+   ## Technical Design Complete
 
-   I've completed technical design for [feature name].
+   I've completed the technical design for ticket [TICKET-ID].
 
-   **Location**: `specs/jira-tickets/[JIRA-TICKET-ID]/technical-design.md`
-
-   **Summary**: [Brief architecture overview]
+   **Location**: `specs/jira-tickets/[TICKET-ID]/technical-design.md`
 
    **Key Decisions**:
-
-   - [Decision 1]: [Rationale]
-   - [Decision 2]: [Rationale]
+   - [Decision 1 with rationale]
+   - [Decision 2 with rationale]
 
    **Technology Stack**:
-
    - Backend: [Tech choices]
    - Frontend: [Tech choices]
-   - Database: [Tech choices]
 
-   **Risks Identified**:
+   **Devils Advocate Applied**: Yes
+   - Concern 1: [How addressed]
+   - Concern 2: [How addressed]
 
-   - [Risk 1]: [Mitigation strategy]
-   - [Risk 2]: [Mitigation strategy]
+   **Confidence Score**: [0-100%]
 
-   **Confidence Score**: [0-100%] - [Rationale]
-
-   **Next Steps** (if approved): Create detailed task breakdown
-
-   Please review and approve to proceed.
+   **Next**: Tasks Agent will create implementation plan (tasks.md)
    ```
 
-### Phase 2: Implementation Plan
+## Phase 2: Tasks Agent - Implementation Plan
 
-Once `technical-design.md` is approved:
+The **Tasks Agent** reads the technical design and creates an atomic task breakdown.
 
-1. **BREAK DOWN Work**
-   - Create atomic, independent tasks
-   - Each task should be completable in 1-4 hours
-   - Identify dependencies between tasks
-   - Assign realistic effort estimates
+### Your Mission (Tasks Agent)
 
-2. **DEVILS ADVOCATE (Self-Critique)**
-   Before presenting tasks, ask yourself:
-   - Are there circular dependencies?
-   - Are estimates realistic or optimistic?
-   - What tasks are missing?
-   - Which tasks are high-risk?
-   - Can these be completed independently?
+Create **`tasks.md`** with detailed, atomic task checklist for implementation.
 
-3. **APPROVAL REQUEST (Gate 3)**
-   Present `tasks.md` for approval:
+### Tasks Agent Workflow
+
+1. **READ Inputs**
+   ```bash
+   TICKET_ID=$(git branch --show-current | sed 's/feature\///')
+   ```
+   
+   - Read `specs/jira-tickets/$TICKET_ID/technical-design.md`
+   - Fetch Jira ticket via MCP for acceptance criteria context
+   - Understand the architecture, components, and design decisions
+
+2. **COPY Tasks Template**
+   ```bash
+   cp specs/templates/tasks.template.md specs/jira-tickets/$TICKET_ID/tasks.md
+   ```
+
+3. **CREATE Atomic Task Breakdown**
+   For each component/phase in the technical design:
+   
+   - Create TASK-### blocks with atomic checklist steps
+   - Each checklist item = single developer action (15-240 minutes)
+   - Include: description, acceptance criteria, implementation steps, files, tests
+
+   **Atomic Checklist Rules:**
+   - One action per line (create file, add field, run command, write test)
+   - No compound steps ("Create model and run migrations" → split into 2 steps)
+   - Include commit steps after logical units of work
+   - Test steps immediately follow implementation steps
+
+4. **MANDATORY: Devils Advocate Self-Critique**
+   Before presenting tasks, challenge your work:
+   - "Are there circular dependencies between tasks?"
+   - "Are estimates realistic or optimistic?"
+   - "What tasks are missing?"
+   - "Which tasks are high-risk and need extra attention?"
+   - "Can each task be completed independently once dependencies are met?"
+   - "Are acceptance criteria specific and testable?"
+   - "Did I include all necessary test tasks?"
+   
+   **Document your critique and refinements made.**
+
+5. **REFINE tasks.md**
+   - Address concerns from Devils Advocate
+   - Add missing tasks identified
+   - Adjust estimates if needed
+   - Ensure proper dependency ordering
+
+6. **REQUEST APPROVAL (Single Gate)**
+   Present tasks.md to user:
 
    ```markdown
-   ## Approval Request: tasks.md
+   ## Approval Request: Implementation Plan
 
-   I've completed implementation plan with [X] tasks.
+   I've created the implementation plan for ticket [TICKET-ID].
 
-   **Summary**: [Brief overview of task breakdown]
+   **Location**: `specs/jira-tickets/[TICKET-ID]/tasks.md`
 
-   **Task Categories**:
+   **Summary**:
+   - Total tasks: [N]
+   - Estimated effort: [X hours/days]
+   - Phases: [List phases]
 
-   - Backend: [X] tasks, [Y] hours estimated
-   - Frontend: [X] tasks, [Y] hours estimated
-   - Testing: [X] tasks, [Y] hours estimated
+   **Task Overview**:
+   1. TASK-001: [Title] - [Effort]
+   2. TASK-002: [Title] - [Effort]
+   ...
 
-   **Critical Path**: [Tasks that block other work]
+   **Dependencies**: [Key dependencies]
 
-   **High-Risk Tasks**: [Tasks with complexity or uncertainty]
+   **Risks Identified**:
+   - [Risk 1]: Mitigation: [Strategy]
 
-   **Confidence Score**: [0-100%] - [Rationale]
+   **Devils Advocate Applied**: Yes - [Key concerns addressed]
 
-   **Next Steps** (if approved): Hand off to Implementation Agents
-
-   Please review and approve to proceed.
+   Please review and approve to proceed to implementation.
    ```
+
+   **Wait for approval before implementation agents begin work.**
 
 ## Output Artifacts
 
@@ -404,17 +460,20 @@ After all tasks complete:
 - [ ] Documentation updated
 - [ ] Security review completed
 - [ ] Performance tested
-- [ ] All requirements in `requirements.md` verified
+- [ ] All Jira ticket acceptance criteria verified
 ```
 
 ## Best Practices
 
 - **Be Explicit**: Include exact file paths, function names, code structure
-- **Be Atomic**: Each task should be independently completable
+- **Be Atomic**: Each task should be independently completable (one action per checklist item)
 - **Be Realistic**: Estimate conservatively, factor in testing time
 - **Be Clear**: Anyone should be able to pick up a task and execute it
-- **Reference Requirements**: Link tasks to specific requirements (REQ-XXX)
+- **Reference Jira**: Link tasks to specific Jira ticket acceptance criteria
 
 ## Reference
 
-See `.github/instructions/spec-driven-workflow.instructions.md` for complete methodology.
+- See `.github/instructions/spec-driven-workflow.instructions.md` for complete methodology
+- See `.github/agents/architect.agent.md` for Architect Agent details
+- See `.github/agents/tasks.agent.md` for Tasks Agent details
+

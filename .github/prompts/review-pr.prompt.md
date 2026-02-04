@@ -21,15 +21,15 @@ You are conducting a comprehensive code review. Your goal is to ensure the PR me
 
 ### 1. Requirements Verification
 
-Read `requirements.md` and verify:
+**Fetch Jira ticket via MCP** and verify:
 
-- [ ] All requirements (REQ-XXX) are addressed
+- [ ] All Jira acceptance criteria are addressed
 - [ ] Acceptance criteria are met and testable
 - [ ] Edge cases are handled
 - [ ] Error scenarios are covered
 - [ ] No unintended scope creep or missing features
 
-**Method**: For each requirement, trace it to specific code changes in the PR.
+**Method**: For each Jira acceptance criterion, trace it to specific code changes in the PR.
 
 ### 2. Design Compliance
 

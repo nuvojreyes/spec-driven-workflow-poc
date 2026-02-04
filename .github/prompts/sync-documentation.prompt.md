@@ -18,11 +18,13 @@ You are updating project documentation to reflect the current state of the codeb
 
 1. **README.md** - User-facing project documentation
 2. **AGENTS.md** - AI agent instructions
-3. **requirements.md** - Feature requirements (if implemented)
-4. **technical-design.md** - Technical architecture (if changed)
+3. **technical-design.md** - Technical architecture (if changed)
+4. **tasks.md** - Implementation plan (if changed)
 5. **API Documentation** - OpenAPI/Swagger specs, inline docs
 6. **Code Comments** - Inline documentation
 7. **Component README files** - Backend, Frontend, QA specific docs
+
+**Note**: Requirements are tracked in Jira tickets (accessed via MCP), not in requirements.md files.
 
 ## Synchronization Process
 
