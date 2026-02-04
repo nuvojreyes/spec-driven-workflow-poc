@@ -9,9 +9,10 @@ applyTo: "**"
 
 ## Core Artifacts
 
-All agents must maintain and reference these three artifacts:
+All agents must maintain and reference these artifacts:
 
-- **`requirements.md`**: User stories and acceptance criteria in EARS notation (created by Product Agent)
+- **Jira Ticket**: Primary source of truth for feature requirements (accessed via Jira MCP)
+- **`requirements.md`**: _(Optional)_ Created only when Product Agent adds value beyond Jira ticket (clarifications, EARS formatting, edge cases, derived test cases)
 - **`technical-design.md`**: Technical architecture and implementation strategy (created by Architect Agent)
 - **`tasks.md`**: Detailed implementation plan with task breakdown (created by Architect Agent)
 
@@ -61,26 +62,48 @@ The creation of the directory structure and copying of templates is **automated 
 
 1. Extract ticket ID from current git branch
 2. Create ticket directory structure
-3. Copy requirements template
-4. Create requirements.md
+3. Fetch Jira ticket via MCP
+4. **Evaluate** if requirements.md is needed:
+   - Are there ambiguities in the Jira ticket?
+   - Are edge cases missing?
+   - Do acceptance criteria need EARS reformatting?
+   - Should specific test cases be derived?
+5. **If YES** (value to add): Create requirements.md with enhancements
+6. **If NO** (Jira is sufficient): Skip requirements.md creation, proceed to approval with Jira as source
 
 ```bash
 # Commands executed automatically by Product Agent:
 TICKET_ID=$(git branch --show-current | sed 's/feature\///')
 mkdir -p specs/jira-tickets/$TICKET_ID/.archive
+
+# Conditional - only if requirements.md adds value:
 cp specs/templates/requirements.template.md specs/jira-tickets/$TICKET_ID/requirements.md
 ```
+
+**Jira MCP Integration:**
+- Use Jira MCP server to fetch ticket details: `jira_getIssue` with ticket ID
+- Extract: summary, description, acceptance criteria, story points, status
+- Reference Jira ticket URL in all documentation
 
 **Architect Agent Responsibilities:**
 
 1. Verify ticket directory exists (create if missing)
-2. Copy technical-design and tasks templates
-3. Create technical-design.md
-4. Create tasks.md
+2. **Read requirements from**:
+   - `requirements.md` if it exists (contains enhancements)
+   - Jira ticket via MCP if no `requirements.md` (Jira is source of truth)
+3. Copy technical-design and tasks templates
+4. Create technical-design.md
+5. Create tasks.md
 
 ```bash
 # Commands executed automatically by Architect Agent:
 TICKET_ID=$(git branch --show-current | sed 's/feature\///')
+
+# Check if requirements.md exists, otherwise use Jira MCP
+if [ ! -f "specs/jira-tickets/$TICKET_ID/requirements.md" ]; then
+  echo "No requirements.md found. Reading from Jira via MCP..."
+fi
+
 cp specs/templates/technical-design.template.md specs/jira-tickets/$TICKET_ID/technical-design.md
 cp specs/templates/tasks.template.md specs/jira-tickets/$TICKET_ID/tasks.md
 ```
@@ -145,18 +168,73 @@ Acceptance Criteria:
 
 Three critical approval gates exist in the workflow:
 
-| **Gate** | **Agent**       | **Artifact**          | **When**                             |
-| -------- | --------------- | --------------------- | ------------------------------------ |
-| Gate 1   | Product Agent   | `requirements.md`     | After requirements analysis complete |
-| Gate 2   | Architect Agent | `technical-design.md` | After technical design complete      |
-| Gate 3   | Architect Agent | `tasks.md`            | After implementation plan complete   |
+| **Gate** | **Agent**       | **Artifact**                           | **When**                             |
+| -------- | --------------- | -------------------------------------- | ------------------------------------ |
+| Gate 1   | Product Agent   | Jira ticket + `requirements.md` (opt.) | After requirements analysis complete |
+| Gate 2   | Architect Agent | `technical-design.md`                  | After technical design complete      |
+| Gate 3   | Architect Agent | `tasks.md`                             | After implementation plan complete   |
+
+**Gate 1 Scenarios:**
+- **Scenario A** (Jira sufficient): Product Agent presents Jira ticket summary and confirms no additional analysis needed
+- **Scenario B** (Enhancements created): Product Agent presents `requirements.md` highlighting value added beyond Jira ticket
 
 ### Approval Request Template
 
-```markdown
-## Approval Request: [artifact name]
+**Product Agent - Scenario A (Jira sufficient):**
 
-I've completed [requirements.md / technical-design.md / tasks.md] for ticket [JIRA-TICKET-ID].
+```markdown
+## Approval Request: Requirements Analysis (Jira as Source)
+
+I've analyzed Jira ticket [JIRA-TICKET-ID] for this feature.
+
+**Jira Ticket**: [Link to Jira ticket]
+**Summary**: [Brief summary of ticket]
+
+**Assessment**: The Jira ticket contains sufficient detail for technical design:
+- Clear acceptance criteria
+- Defined user stories
+- Edge cases documented
+- No ambiguities identified
+
+**No requirements.md created** - Jira ticket serves as source of truth.
+
+**Next Steps** (if approved): Architect Agent will read directly from Jira via MCP
+
+Please review the Jira ticket and approve to proceed to technical design.
+```
+
+**Product Agent - Scenario B (Enhancements created):**
+
+```markdown
+## Approval Request: Requirements Analysis (Enhanced)
+
+I've analyzed Jira ticket [JIRA-TICKET-ID] and created requirements.md with enhancements.
+
+**Jira Ticket**: [Link to Jira ticket]
+**Location**: `specs/jira-tickets/[JIRA-TICKET-ID]/requirements.md`
+
+**Value Added**:
+- [Clarification 1]: [Explanation]
+- [Edge case identified]: [Description]
+- [EARS reformatting]: [Why it was needed]
+- [Derived test cases]: [Count and rationale]
+
+**Key Decisions**:
+- [Decision 1 with rationale]
+
+**Confidence Score**: [0-100%] - [Rationale]
+
+**Next Steps** (if approved): Architect Agent will use both Jira + requirements.md
+
+Please review and approve to proceed.
+```
+
+**Architect Agent Template (unchanged):**
+
+```markdown
+## Approval Request: [technical-design.md / tasks.md]
+
+I've completed [technical-design.md / tasks.md] for ticket [JIRA-TICKET-ID].
 
 **Location**: `specs/jira-tickets/[JIRA-TICKET-ID]/[artifact-name].md`
 **Key Decisions**:
@@ -187,9 +265,17 @@ Please review and approve to proceed.
 
 ### Built-in Self-Critique (Product & Architect Agents)
 
-**Product Agent** - Before presenting `requirements.md`:
+**Product Agent** - Before presenting requirements analysis:
 
-- "What scenarios are missing from requirements?"
+**First, evaluate necessity:**
+- "Does the Jira ticket already contain clear, unambiguous requirements?"
+- "Are there edge cases or scenarios missing from the Jira ticket?"
+- "Would EARS reformatting add clarity for technical implementation?"
+- "Can specific test cases be derived that aren't obvious from acceptance criteria?"
+- "Am I creating requirements.md just to copy Jira content?" (If yes, don't create it)
+
+**If creating requirements.md, then ask:**
+- "What scenarios are missing from the Jira ticket?"
 - "Is this requirement ambiguous or unclear?"
 - "What unusual inputs or edge cases could break this?"
 - "Can we write automated tests to validate this?"
@@ -229,12 +315,16 @@ Implementation agents can invoke the **standalone Devils Advocate agent** when:
 ### Phase Transitions
 
 1. **Product Agent → Architect Agent**
-   - **Trigger**: `requirements.md` approved by user
-   - **Handoff**: Product Agent notifies completion, Architect Agent reads `requirements.md`
+   - **Trigger**: Requirements analysis approved by user (Jira only OR Jira + requirements.md)
+   - **Handoff**:
+     - Product Agent notifies completion
+     - Architect Agent reads `requirements.md` if exists, otherwise fetches Jira ticket via MCP
 
 2. **Architect Agent → Implementation Agents**
    - **Trigger**: Both `technical-design.md` and `tasks.md` approved by user
-   - **Handoff**: Architect Agent notifies completion, Implementation Agents read all three spec files
+   - **Handoff**:
+     - Architect Agent notifies completion
+     - Implementation Agents read: Jira ticket (via MCP) + `requirements.md` (if exists) + `technical-design.md` + `tasks.md`
 
 3. **Implementation Agents → User**
    - **Trigger**: All tasks complete, tests pass, PR created
