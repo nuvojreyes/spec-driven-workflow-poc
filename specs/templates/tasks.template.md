@@ -9,7 +9,7 @@ Short purpose: use small, atomic checklist steps for implementation. Each checkl
 
 ---
 
-## Implementation Steps Format (Atomic Checklist)
+## Implementation Steps Format [REQUIRED]
 
 - Use a markdown checklist for each task's implementation steps. Keep steps short and atomic.
 - Agents MUST request explicit human approval before toggling any `- [ ]` to `- [x]`. When they do toggle items they must report which items were changed, why, and include any artifacts (logs, diffs, screenshots) as applicable.
@@ -60,7 +60,7 @@ Short purpose: use small, atomic checklist steps for implementation. Each checkl
 
 ---
 
-## Progress Tracking
+## Progress Tracking [IF-APPLICABLE]
 
 - Use the per-task atomic checklists as the single source of truth for progress. Do not duplicate progress elsewhere.
 - At top of the file, add a small project progress summary if desired (optional):
@@ -70,7 +70,7 @@ Short purpose: use small, atomic checklist steps for implementation. Each checkl
 
 ---
 
-## Definition of Done
+## Definition of Done [REQUIRED]
 
 - [ ] All task implementation checklist items completed and reviewed
 - [ ] All acceptance criteria checked
@@ -79,7 +79,7 @@ Short purpose: use small, atomic checklist steps for implementation. Each checkl
 
 ---
 
-## Approval
+## Approval [REQUIRED]
 
 **Submitted by**: [Agent/Person]
 **Submitted on**: [Date]
