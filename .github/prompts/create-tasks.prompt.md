@@ -1,6 +1,6 @@
 ---
 description: "Invoke Tasks Agent to create implementation plan from technical design"
-agent: "Tasks Agent"
+agent: "Task Planner Agent"
 tools:
   [
     "search/changes",
