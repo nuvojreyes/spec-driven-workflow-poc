@@ -98,8 +98,11 @@ Select the Tasks Planner agent and start the request:
 Create an implementation plan for Jira ticket PROJ-123 based on the technical design.
 ```
 
-**Option B: Continue with design-solution prompt**
-(It automatically invokes Tasks Agent after Architect completes)
+**Option B: Via Prompt**
+
+```
+/create-tasks Create an implementation plan for Jira ticket PROJ-123 based on the technical design.
+```
 
 **What the Tasks Agent does**:
 
@@ -236,12 +239,10 @@ Each Jira ticket produces these artifacts in `specs/jira-tickets/<TICKET-ID>/`:
 
 Located in `.github/prompts/`:
 
-- `design-solution.prompt.md` - Architect + Tasks workflow
+- `design-solution.prompt.md` - Architect workflow
+- `create-tasks.prompt.md` - Tasks workflow from technical design
 - `devils-advocate.prompt.md` - Critical analysis
 - `review-pr.prompt.md` - PR review checklist
-- `generate-tests.prompt.md` - Create test suite
-- `refactor-code.prompt.md` - Code improvements
-- `sync-documentation.prompt.md` - Update docs
 - `conventional-commit.prompt.md` - Generate commit message
 
 ## Quick Reference

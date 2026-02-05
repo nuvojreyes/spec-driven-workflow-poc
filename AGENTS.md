@@ -137,19 +137,17 @@ Located in `.github/agents/`:
 
 Quick-start prompts in `.github/prompts/`:
 
-| Prompt                          | Purpose                            | Invokes                  |
-| ------------------------------- | ---------------------------------- | ------------------------ |
-| `design-solution.prompt.md`     | Create technical design & tasks    | Architect Agent workflow |
-| `devils-advocate.prompt.md`     | Get critical analysis              | Devils Advocate agent    |
-| `review-pr.prompt.md`           | Review pull request                | PR review checklist      |
-| `generate-tests.prompt.md`      | Create test suite from Jira ticket | Test generation          |
-| `refactor-code.prompt.md`       | Improve code quality               | Refactoring patterns     |
-| `sync-documentation.prompt.md`  | Update all documentation           | Doc synchronization      |
-| `conventional-commit.prompt.md` | Generate commit message            | Git workflow             |
+| Prompt                          | Purpose                         | Invokes                  |
+| ------------------------------- | ------------------------------- | ------------------------ |
+| `design-solution.prompt.md`     | Create technical design & tasks | Architect Agent workflow |
+| `create-tasks.prompt.md`        | Create implementation plan      | Tasks Agent workflow     |
+| `devils-advocate.prompt.md`     | Get critical analysis           | Devils Advocate agent    |
+| `review-pr.prompt.md`           | Review pull request             | PR review checklist      |
+| `conventional-commit.prompt.md` | Generate commit message         | Git workflow             |
 
 ### How to Use Prompts
 
-1. **Invoke via chat**: "@workspace use design-solution prompt"
+1. **Invoke via chat**: "/design-solution ..."
 2. **Follow the workflow**: Prompts guide you through each phase
 3. **Submit for approval**: Single approval gate after tasks.md
 
