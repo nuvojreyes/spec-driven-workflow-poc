@@ -144,10 +144,12 @@ I've completed the technical design for ticket [TICKET-ID].
 **Location**: `specs/jira-tickets/[TICKET-ID]/technical-design.md`
 
 **Key Decisions**:
+
 - [Decision 1]
 - [Decision 2]
 
 **Devils Advocate Applied**: Yes
+
 - Concern 1: [How addressed]
 - Concern 2: [How addressed]
 
@@ -174,7 +176,7 @@ I've completed the technical design for ticket [TICKET-ID].
 
 **Date**: [YYYY-MM-DD]
 **Status**: Draft | In Review | Approved
-**Requirements**: Link to requirements.md
+**Jira Ticket**: [TICKET-ID] (Link to Jira ticket)
 
 ## 1. Overview
 
@@ -596,8 +598,8 @@ Reference: `.github/instructions/security-and-owasp.instructions.md`
 # Implementation Plan: [Feature Name]
 
 **Date**: [YYYY-MM-DD]
-**Design**: Link to design.md
-**Requirements**: Link to requirements.md
+**Design**: Link to technical-design.md
+**Jira Ticket**: [TICKET-ID] (Link to Jira ticket)
 
 ## Summary
 
@@ -1003,8 +1005,8 @@ Before marking implementation complete:
 
 **Read and Understand Requirements**:
 ```markdown
-1. Load requirements.md
-2. Identify all user stories (EARS notation)
+1. Fetch Jira ticket via MCP
+2. Identify all user stories and acceptance criteria
 3. Extract functional and non-functional requirements
 4. Clarify ambiguities (ask questions if needed)
 5. Assess complexity and confidence
@@ -1245,7 +1247,7 @@ Clear, concise description of what needs to be done.
 
 ### Before Creating Design
 
-- [ ] Requirements.md thoroughly analyzed
+- [ ] Jira ticket thoroughly analyzed via MCP
 - [ ] Current codebase reviewed
 - [ ] Technology stack constraints understood
 - [ ] Integration points identified

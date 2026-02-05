@@ -398,17 +398,15 @@
 
 ### Change Management
 
-**Scope Changes**: Require Product Agent re-analysis and approval  
+**Scope Changes**: Update Jira ticket and require Architect Agent re-design  
 **Design Changes**: Require Architect Agent re-design and approval  
 **Bug Fixes**: Can proceed with minimal approval (PR review)
 
 ### Approval Gates
 
-1. **Gate 1**: Requirements approval (requirements.md)
-2. **Gate 2**: Technical design approval (technical-design.md)
-3. **Gate 3**: Implementation plan approval (tasks.md)
-4. **Gate 4**: PR approval (code review)
-5. **Gate 5**: Production deployment approval
+1. **Gate 1**: Implementation plan approval (tasks.md) - SINGLE GATE
+2. **Gate 2**: PR approval (code review)
+3. **Gate 3**: Production deployment approval
 
 ---
 

@@ -8,16 +8,13 @@ This directory contains all specification artifacts for the project, organized b
 specs/
 ├── jira-tickets/          # JIRA ticket-specific specifications
 │   ├── PROJ-123-feature-name/
-│   │   ├── requirements.md
 │   │   ├── technical-design.md
 │   │   ├── tasks.md
 │   │   └── .archive/      # Versioned history of specs
-│   │       ├── requirements-v1-2026-01-15.md
 │   │       └── technical-design-v1-2026-01-15.md
 │   └── PROJ-456-another-feature/
 │       └── ...
 └── templates/             # Reusable templates
-    ├── requirements.template.md
     ├── technical-design.template.md
     └── tasks.template.md
 ```
@@ -26,9 +23,9 @@ specs/
 
 ### Starting a New Feature (Automated by Agents)
 
-**The Product and Architect agents handle setup automatically.** When you invoke them:
+**The Architect agent handles setup automatically.** When you invoke it:
 
-1. **Product Agent** (automatically executes):
+1. **Architect Agent** (automatically executes):
 
    ```bash
    # Use the specified Jira ticket ID (e.g., PROJ-123)
@@ -37,24 +34,13 @@ specs/
    # Create directory structure
    mkdir -p specs/jira-tickets/$TICKET_ID/.archive
 
-   # Copy requirements template
-   cp specs/templates/requirements.template.md specs/jira-tickets/$TICKET_ID/requirements.md
-   ```
-
-2. **Architect Agent** (automatically executes):
-
-   ```bash
-   # Use the same Jira ticket ID (created by Product Agent)
-   TICKET_ID="<specified-jira-ticket>"
-
-   # Copy additional templates
+   # Copy templates
    cp specs/templates/technical-design.template.md specs/jira-tickets/$TICKET_ID/technical-design.md
    cp specs/templates/tasks.template.md specs/jira-tickets/$TICKET_ID/tasks.md
    ```
 
-**You don't need to run these commands manually.** Simply invoke the agents via prompts:
+**You don't need to run these commands manually.** Simply invoke the agent via prompt:
 
-- `.github/prompts/analyze-requirements.prompt.md` - Invokes Product Agent
 - `.github/prompts/design-solution.prompt.md` - Invokes Architect Agent
 
 ### The .archive/ Directory
@@ -63,41 +49,36 @@ specs/
 
 **When to Archive**:
 
-- Before major requirement changes (scope expansion, feature pivots)
 - Before significant design revisions (architecture changes)
 - When stakeholders request to see evolution of decisions
 - Prior to major refactoring that affects original specs
 
 **Benefits**:
 
-- 📜 **Audit Trail**: Track how requirements evolved over time
+- 📜 **Audit Trail**: Track how design evolved over time
 - 🔍 **Decision History**: Understand why certain decisions were made
 - 🔄 **Rollback Reference**: Revert to previous versions if needed
-- 📊 **Stakeholder Communication**: Show requirement evolution to stakeholders
+- 📊 **Stakeholder Communication**: Show design evolution to stakeholders
 
 **How to Archive**:
 
 ```bash
 # Archive current version before making major changes
 TICKET_ID="<specified-jira-ticket>"  # Use the Jira ticket ID
-cp specs/jira-tickets/$TICKET_ID/requirements.md \
-   specs/jira-tickets/$TICKET_ID/.archive/requirements-v1-$(date +%Y-%m-%d).md
+cp specs/jira-tickets/$TICKET_ID/technical-design.md \
+   specs/jira-tickets/$TICKET_ID/.archive/technical-design-v1-$(date +%Y-%m-%d).md
 ```
 
-**Example**: If requirements for PROJ-123 change significantly after initial approval, archive the original version so you can compare what changed and why.
+**Example**: If design for PROJ-123 changes significantly after initial approval, archive the original version so you can compare what changed and why.
 
 ## Core Artifacts
 
-### requirements.md
-
-- **Owner**: Product Agent
-- **Purpose**: Define user stories and acceptance criteria using EARS notation
-- **Approval**: Gate 1 - User must approve before design phase
+**Note**: Requirements come directly from Jira tickets (via MCP). No separate requirements.md file is created.
 
 ### technical-design.md
 
 - **Owner**: Architect Agent
-- **Purpose**: Define technical architecture, data models, API contracts
+- **Purpose**: Define technical architecture, data models, API contracts based on Jira ticket
 - **Approval**: Gate 2 - User must approve before creating tasks
 
 ### tasks.md
@@ -118,11 +99,10 @@ cp specs/jira-tickets/$TICKET_ID/requirements.md \
 
 ### Architect Agent
 
-- Read approved `specs/jira-tickets/<ticket-id>/requirements.md`
+- Fetch Jira ticket via MCP and analyze requirements
 - Create `technical-design.md` using template
-- Submit for Gate 2 approval
 - Create `tasks.md` using template
-- Submit for Gate 3 approval
+- Submit for approval (single gate)
 
 ### Implementation Agents (Backend, Frontend, QA)
 
@@ -211,7 +191,7 @@ Agents use the Jira ticket ID specified by the user:
 TICKET_ID="PROJ-123-feature-name"
 
 # Use in paths
-echo "specs/jira-tickets/$TICKET_ID/requirements.md"
+echo "specs/jira-tickets/$TICKET_ID/technical-design.md"
 ```
 
 **Best Practice**: Provide the complete ticket directory name (e.g., `PROJ-123-weather-search`) to agents when starting work.
@@ -251,8 +231,7 @@ TICKET_ID="PROJ-123-legacy-feature"
 # Create ticket directory
 mkdir -p specs/jira-tickets/$TICKET_ID/.archive
 
-# Move existing specs
-mv requirements.md specs/jira-tickets/$TICKET_ID/
+# Move existing specs (no requirements.md - use Jira ticket instead)
 mv technical-design.md specs/jira-tickets/$TICKET_ID/
 mv tasks.md specs/jira-tickets/$TICKET_ID/
 

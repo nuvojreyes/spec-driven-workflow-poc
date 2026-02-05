@@ -39,8 +39,8 @@ Compare documentation against reality:
 | ------------------- | ------------ | ----------- | ------------------------- |
 | README.md           | 2025-12-01   | ⚠️ Outdated | Missing new API endpoints |
 | AGENTS.md           | 2026-01-15   | ✅ Current  | None                      |
-| requirements.md     | 2026-01-20   | ✅ Current  | None                      |
 | technical-design.md | 2025-12-01   | ⚠️ Outdated | Architecture changed      |
+| tasks.md            | 2026-01-20   | ✅ Current  | None                      |
 | backend/README.md   | 2025-11-01   | ❌ Stale    | Setup steps incorrect     |
 | API docs            | Never        | ❌ Missing  | No API documentation      |
 ```
@@ -65,15 +65,15 @@ Update if broken or outdated.
 
 #### Features Section
 
-Compare with `requirements.md`:
+Compare with Jira tickets:
 
 ```markdown
 ## Features
 
-- ✅ Weather search by city name (REQ-001)
-- ✅ Historical weather data (REQ-002)
-- 🚧 Weather alerts (REQ-003) - In development
-- ❌ International support (REQ-004) - Planned
+- ✅ Weather search by city name (PROJ-001)
+- ✅ Historical weather data (PROJ-002)
+- 🚧 Weather alerts (PROJ-003) - In development
+- ❌ International support (PROJ-004) - Planned
 ```
 
 #### API Documentation
@@ -245,17 +245,19 @@ If implementation deviated from design:
 
 Update diagrams, schemas, and specifications to match reality.
 
-#### Update requirements.md
+#### Update Jira Ticket
 
-If requirements were refined during implementation:
+If requirements were refined during implementation, update the Jira ticket:
 
 ```markdown
-## REQ-001: Weather Search (UPDATED)
+Comment on Jira ticket:
 
-~~WHEN a user enters a city name and clicks "Search"~~
-WHEN a user enters a city name and presses Enter OR clicks "Search"
+## Implementation Update: REQ-001
 
-**Rationale**: Added keyboard support for better UX
+Refined acceptance criteria:
+
+- Added keyboard support (Enter key) in addition to click
+- Rationale: Better UX and accessibility
 ```
 
 Mark requirements as implemented:
@@ -467,7 +469,7 @@ Before finalizing:
 - [ ] Technology stack versions current
 - [ ] Architecture diagrams reflect reality
 - [ ] Code comments accurate and helpful
-- [ ] requirements.md status updated
+- [ ] Jira tickets updated with implementation notes
 - [ ] technical-design.md matches implementation
 - [ ] Component READMEs updated
 - [ ] Examples in docs are valid
@@ -527,6 +529,6 @@ npx conventional-changelog -p angular -i CHANGELOG.md -s
 
 - `README.md` - Project overview
 - `AGENTS.md` - AI agent instructions
-- `requirements.md` - Feature specifications
+- **Jira Tickets** (via MCP) - Feature specifications
 - `technical-design.md` - Architecture details
 - `.github/instructions/` - Coding standards

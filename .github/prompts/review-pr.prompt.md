@@ -232,7 +232,7 @@ test("should handle API timeout gracefully", async ({ page }) => {
    - Review changed files list
 
 2. **Requirements Trace**
-   - For each REQ-XXX in `requirements.md`
+   - For each acceptance criterion in Jira ticket
    - Find corresponding implementation
    - Verify acceptance criteria met
 

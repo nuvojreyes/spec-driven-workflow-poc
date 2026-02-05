@@ -45,8 +45,8 @@ Each subdirectory has its own README.md with component-specific details.
 This project follows a **Specification-Driven Development Workflow**. Before implementing any feature:
 
 1. **Understand the workflow** - Read `.github/instructions/spec-driven-workflow.instructions.md`
-2. **Follow the process** - Requirements → Design → Implementation → Validation
-3. **Use the artifacts** - Maintain `requirements.md`, `technical-design.md`, `tasks.md`
+2. **Follow the process** - Jira Ticket → Design → Implementation → Validation
+3. **Use the artifacts** - Jira Ticket (via MCP), `technical-design.md`, `tasks.md`
 
 ### Spec-Driven Workflow Overview
 
@@ -113,15 +113,15 @@ Specialized agents handle different aspects of development:
 
 Located in `.github/agents/`:
 
-| Agent               | Role                           | Primary Responsibility                               |
-| ------------------- | ------------------------------ | ---------------------------------------------------- |
-| **Architect**       | Technical Design               | Create `technical-design.md`                         |
-| **Tasks**           | Implementation Planning        | Create `tasks.md` with atomic task breakdown         |
-| **Backend**         | Django/Python Development      | Implement backend features per `tasks.md`            |
-| **Frontend**        | Angular/TypeScript Development | Implement frontend features per `tasks.md`           |
-| **QA**              | Testing & Quality              | Create E2E tests, validate requirements              |
-| **DevOps**          | Infrastructure & CI/CD         | Docker, deployment, pipelines                        |
-| **Devils Advocate** | Critical Analysis              | Challenge assumptions, find flaws                    |
+| Agent               | Role                           | Primary Responsibility                       |
+| ------------------- | ------------------------------ | -------------------------------------------- |
+| **Architect**       | Technical Design               | Create `technical-design.md`                 |
+| **Tasks**           | Implementation Planning        | Create `tasks.md` with atomic task breakdown |
+| **Backend**         | Django/Python Development      | Implement backend features per `tasks.md`    |
+| **Frontend**        | Angular/TypeScript Development | Implement frontend features per `tasks.md`   |
+| **QA**              | Testing & Quality              | Create E2E tests, validate requirements      |
+| **DevOps**          | Infrastructure & CI/CD         | Docker, deployment, pipelines                |
+| **Devils Advocate** | Critical Analysis              | Challenge assumptions, find flaws            |
 
 ### When to Use Which Agent
 
@@ -137,15 +137,15 @@ Located in `.github/agents/`:
 
 Quick-start prompts in `.github/prompts/`:
 
-| Prompt                           | Purpose                             | Invokes                  |
-| -------------------------------- | ----------------------------------- | ------------------------ |
-| `design-solution.prompt.md`      | Create technical design & tasks     | Architect Agent workflow |
-| `devils-advocate.prompt.md`      | Get critical analysis               | Devils Advocate agent    |
-| `review-pr.prompt.md`            | Review pull request                 | PR review checklist      |
-| `generate-tests.prompt.md`       | Create test suite from Jira ticket  | Test generation          |
-| `refactor-code.prompt.md`        | Improve code quality                | Refactoring patterns     |
-| `sync-documentation.prompt.md`   | Update all documentation            | Doc synchronization      |
-| `conventional-commit.prompt.md`  | Generate commit message             | Git workflow             |
+| Prompt                          | Purpose                            | Invokes                  |
+| ------------------------------- | ---------------------------------- | ------------------------ |
+| `design-solution.prompt.md`     | Create technical design & tasks    | Architect Agent workflow |
+| `devils-advocate.prompt.md`     | Get critical analysis              | Devils Advocate agent    |
+| `review-pr.prompt.md`           | Review pull request                | PR review checklist      |
+| `generate-tests.prompt.md`      | Create test suite from Jira ticket | Test generation          |
+| `refactor-code.prompt.md`       | Improve code quality               | Refactoring patterns     |
+| `sync-documentation.prompt.md`  | Update all documentation           | Doc synchronization      |
+| `conventional-commit.prompt.md` | Generate commit message            | Git workflow             |
 
 ### How to Use Prompts
 
@@ -700,40 +700,45 @@ Workflow Best Practices
 
 ### Feature Development Checklist
 
-When implementing a new feature:
+When implementing a new feature, follow the spec-driven workflow:
 
-1. **Start with Requirements** (`analyze-requirements.prompt.md`)
-   - [ ] Create `requirements.md` with EARS notation
-   - [ ] Define acceptance criteria
-   - [ ] Identify edge cases
-   - [ ] Get user approval (Gate 1)
+#### Phase 1: DESIGN (Architect Agent)
 
-2. **Design the Solution** (`design-solution.prompt.md`)
-   - [ ] Create `technical-design.md`
-   - [ ] Choose tech stack and patterns
-   - [ ] Design data models and APIs
-   - [ ] Get user approval (Gate 2)
-   - [ ] Create `tasks.md` with atomic tasks
-   - [ ] Get user approval (Gate 3)
+- [ ] Fetch Jira ticket via MCP
+- [ ] Analyze codebase and constraints
+- [ ] Create `technical-design.md`
+- [ ] Apply **Devils Advocate self-critique**
+- [ ] Refine design based on critique
+- [ ] Hand off to Tasks Agent
 
-3. **Implement**
-   - [ ] Follow tasks in `tasks.md`
-   - [ ] Write tests for each requirement
-   - [ ] Follow coding standards
-   - [ ] Run tests continuously
-   - [ ] Commit following git workflow
+#### Phase 2: PLAN (Tasks Agent)
 
-4. **Validate**
-   - [ ] All tests pass
-   - [ ] Requirements verified
-   - [ ] Code reviewed
-   - [ ] Documentation updated
+- [ ] Read `technical-design.md` + Jira ticket
+- [ ] Create atomic task breakdown in `tasks.md`
+- [ ] Apply **Devils Advocate self-critique**
+- [ ] Refine tasks based on critique
+- [ ] **Request user approval (SINGLE GATE)**
 
-5. **Deploy**
-   - [ ] Create PR following standards
-   - [ ] Pass CI/CD checks
-   - [ ] Get approvals
-   - [ ] Merge and deploy
+#### Phase 3: IMPLEMENT (Backend/Frontend Agents)
+
+- [ ] Read: Jira + `technical-design.md` + `tasks.md`
+- [ ] Execute ONE atomic task at a time
+- [ ] Request approval before each task
+- [ ] Update `tasks.md` checklist after completion
+- [ ] After ALL tasks complete: **Apply Devils Advocate review**
+- [ ] Ensure all tests pass
+- [ ] Follow coding standards
+- [ ] Commit following git workflow
+
+#### Phase 4: COMPLETE
+
+- [ ] All tasks verified complete
+- [ ] All tests passing
+- [ ] Code reviewed
+- [ ] Documentation updated
+- [ ] Create PR following standards
+- [ ] Pass CI/CD checks
+- [ ] Get approvals and merge
 
 ### Common Workflows
 
@@ -809,18 +814,15 @@ cd qa && npm install
 - [ ] No new warnings
 - [ ] Branch up to date with target
 - [ ] Commit messages follow convention
-1. **requirements.md**: User stories and acceptance criteria in EARS notation
-2. **design.md**: Technical architecture and implementation plan
-3. **tasks.md**: Detailed, trackable implementation tasks
 
 ### Workflow Phases
 
-1. **ANALYZE**: Understand requirements and define acceptance criteria
-2. **DESIGN**: Create technical design and implementation plan
-3. **IMPLEMENT**: Write code in small, testable increments
-4. **VALIDATE**: Run tests and verify requirements are met
-5. **REFLECT**: Refactor, update docs, identify improvements
-6. **HANDOFF**: Package work for review and deployment
+Follow the **Specification-Driven Development Workflow**:
+
+1. **DESIGN**: Architect Agent creates `technical-design.md` from Jira ticket
+2. **PLAN**: Tasks Agent creates `tasks.md` with atomic task breakdown (SINGLE APPROVAL GATE)
+3. **IMPLEMENT**: Backend/Frontend Agents execute tasks one at a time
+4. **COMPLETE**: All tasks done, tests pass, PR created and reviewed
 
 ## Additional Resources
 

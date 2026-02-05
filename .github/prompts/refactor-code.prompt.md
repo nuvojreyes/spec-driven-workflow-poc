@@ -390,7 +390,7 @@ After refactoring:
    ```
 
 3. **Verify Requirements** still met:
-   - Read `requirements.md`
+   - Review Jira ticket acceptance criteria
    - Manually verify each requirement
    - Run acceptance tests
 
@@ -415,7 +415,7 @@ Before committing refactored code:
 
 - [ ] All existing tests pass
 - [ ] Code coverage maintained or improved
-- [ ] All requirements in `requirements.md` still met
+- [ ] All Jira ticket acceptance criteria still met
 - [ ] Follows coding standards in `.github/instructions/`
 - [ ] No new security vulnerabilities introduced
 - [ ] Performance not degraded (or improved if that was goal)
@@ -451,5 +451,5 @@ Avoid refactoring if:
 - `.github/instructions/python.instructions.md` - Python refactoring patterns
 - `.github/instructions/angular.instructions.md` - Angular refactoring patterns
 - `.github/instructions/security-and-owasp.instructions.md` - Security improvements
-- `requirements.md` - Functionality to preserve
+- **Jira Ticket** (via MCP) - Functionality to preserve
 - `technical-design.md` - Intended architecture

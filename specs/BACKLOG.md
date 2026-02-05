@@ -912,22 +912,18 @@ git checkout -b feature/CUSTOM-001-my-feature
 
 ### For Agents
 
-**Product Agent**: Reference this backlog when creating `requirements.md`  
-**Architect Agent**: Use backlog context for design decisions  
-**Implementation Agents**: Consult backlog for feature context
+**Architect Agent**: Fetch Jira ticket via MCP and create design based on ticket requirements  
+**Implementation Agents**: Consult Jira ticket and design docs for feature context
 
 ### Workflow Pattern
 
 1. **Select ticket** from backlog (e.g., WEATHER-007)
 2. **Create branch**: `feature/WEATHER-007-forecast`
-3. **Invoke Product Agent**: Analyze requirements
-4. **Approval Gate 1**: Review and approve requirements.md
-5. **Invoke Architect Agent**: Design solution
-6. **Approval Gate 2**: Review and approve technical-design.md
-7. **Approval Gate 3**: Review and approve tasks.md
-8. **Implementation**: Follow tasks.md
-9. **Testing**: Verify all acceptance criteria
-10. **PR**: Create pull request
+3. **Invoke Architect Agent**: Fetch Jira ticket and design solution
+4. **Approval Gate**: Review and approve tasks.md (single gate)
+5. **Implementation**: Follow tasks.md
+6. **Testing**: Verify all acceptance criteria
+7. **PR**: Create pull request
 
 ---
 

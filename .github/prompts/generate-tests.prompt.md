@@ -1,5 +1,5 @@
 ---
-description: "Generate comprehensive test suite based on requirements.md"
+description: "Generate comprehensive test suite based on Jira ticket acceptance criteria"
 tools:
   [
     "search/changes",
@@ -68,7 +68,7 @@ You are creating comprehensive tests based on Jira ticket acceptance criteria. Y
 
 ### Step 1: Map Requirements to Tests
 
-For each requirement in `requirements.md`:
+For each requirement in the Jira ticket:
 
 ```markdown
 REQ-001: Weather Search
@@ -375,4 +375,4 @@ After generating tests:
 - `.github/instructions/playwright-typescript.instructions.md` - Playwright standards
 - `.github/instructions/python.instructions.md` - Django testing patterns
 - `.github/instructions/angular.instructions.md` - Angular testing patterns
-- `requirements.md` - Source of truth for what to test
+- **Jira Ticket** (via MCP) - Source of truth for what to test
