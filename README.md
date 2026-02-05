@@ -62,14 +62,16 @@ git checkout -b feature/PROJ-123-brief-description
 
 **Option A: Via GitHub Copilot/Claude**
 
+Select the agent and start the request:
+
 ```
-@workspace use architect agent for PROJ-123
+Prepare the technical design for Jira ticket PROJ-123.
 ```
 
 **Option B: Via Prompt**
 
 ```
-@workspace use design-solution prompt
+/design-solution Prepare the technical design for Jira ticket PROJ-123.
 ```
 
 **What the Architect Agent does**:
@@ -90,8 +92,10 @@ git checkout -b feature/PROJ-123-brief-description
 
 **Option A: Via GitHub Copilot/Claude**
 
+Select the Tasks Planner agent and start the request:
+
 ```
-@workspace use tasks agent
+Create an implementation plan for Jira ticket PROJ-123 based on the technical design.
 ```
 
 **Option B: Continue with design-solution prompt**
@@ -124,16 +128,24 @@ git checkout -b feature/PROJ-123-brief-description
 
 ### Step 5: Implement Tasks (One at a Time)
 
-**Invoke Implementation Agent**:
+**Option A: Via GitHub Copilot/Claude**
+
+Select the appropriate agent and start the request:
 
 ```
-@workspace use backend agent to implement TASK-001
+Implement TASK-001 from the tasks.md
+```
+
+**Option B: Via Direct Agent Invocation**
+
+```
+Invoke backend agent to implement TASK-001
 ```
 
 or
 
 ```
-@workspace use frontend agent to implement TASK-005
+Invoke frontend agent to implement TASK-005
 ```
 
 **Implementation workflow per task**:
@@ -183,7 +195,7 @@ git push origin feature/PROJ-123-brief-description
 
 **PR Review**:
 
-- Use `review-pr` prompt: `@workspace use review-pr prompt`
+- Use `review-pr` prompt: `/review-pr` to get a checklist for reviewers
 - Verifies against Jira acceptance criteria
 - Checks technical design compliance
 - Validates code quality standards
@@ -238,7 +250,7 @@ Located in `.github/prompts/`:
 
 ```bash
 git checkout -b feature/PROJ-123-name
-@workspace use design-solution prompt
+/design-solution Prepare the technical design for Jira ticket PROJ-123.
 ```
 
 **Check progress**:

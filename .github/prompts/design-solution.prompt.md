@@ -1,5 +1,5 @@
 ---
-description: "Invoke Architect Agent and Tasks Agent to create technical design and implementation plan from Jira ticket"
+description: "Invoke Architect Agent to create technical design from Jira ticket"
 agent: "Expert Software Architect"
 tools:
   [
@@ -17,7 +17,7 @@ tools:
 
 # Design Technical Solution
 
-This prompt invokes the **Architect Agent** followed by the **Tasks Agent** to transform a Jira ticket into a complete technical design and implementation plan.
+This prompt invokes the **Architect Agent** to create a comprehensive technical design from a Jira ticket.
 
 ## Prerequisites
 
@@ -34,11 +34,10 @@ Jira Ticket (via MCP)
 ├─ Creates technical-design.md
 └─ MANDATORY: Devils Advocate
          ↓
-[Tasks Agent]
-├─ Creates tasks.md
-├─ MANDATORY: Devils Advocate
-└─ REQUEST APPROVAL (SINGLE GATE)
+[Hand off to Tasks Agent]
 ```
+
+**Note**: This prompt only creates the technical design. Use the `create-tasks` prompt to generate the implementation plan (`tasks.md`).
 
 ## Phase 1: Architect Agent - Technical Design
 
@@ -48,7 +47,7 @@ The **Architect Agent** creates the technical architecture from the Jira ticket.
 
 Create **`technical-design.md`** with architecture, tech stack, data models, and API contracts.
 
-**Note**: Architect Agent does NOT create tasks.md. That's handled by Tasks Agent in Phase 2.
+**Note**: You do NOT create tasks.md. After completing technical-design.md, notify that Tasks Agent can create the implementation plan.
 
 ### Architect Agent Workflow
 
@@ -126,362 +125,55 @@ Create **`technical-design.md`** with architecture, tech stack, data models, and
 
    **Confidence Score**: [0-100%]
 
-   **Next**: Tasks Agent will create implementation plan (tasks.md)
+   **Next Steps**:
+
+   - Review the technical design
+   - Use `create-tasks` prompt to generate implementation plan (tasks.md)
    ```
 
-## Phase 2: Tasks Agent - Implementation Plan
+## Output Artifact
 
-The **Tasks Agent** reads the technical design and creates an atomic task breakdown.
+After completing this prompt, you will have created:
 
-### Your Mission (Tasks Agent)
+### technical-design.md
 
-Create **`tasks.md`** with detailed, atomic task checklist for implementation.
+**Location**: `specs/jira-tickets/<TICKET-ID>/technical-design.md`  
+**Template**: `specs/templates/technical-design.template.md`
 
-### Tasks Agent Workflow
+**Key Sections**:
 
-1. **READ Inputs**
+- Overview and system context
+- Technology stack with rationale
+- Architecture design with Mermaid diagrams
+- Data models and database schema
+- API contracts (request/response formats)
+- Component design (frontend/backend)
+- Security considerations (OWASP compliance)
+- Performance and scalability design
+- Testing strategy
+- Deployment and monitoring
+- Technical risks and mitigation
+- Architecture Decision Records (ADRs)
+- Dependencies and open questions
 
-   ```bash
-   TICKET_ID=$(git branch --show-current | sed 's/feature\///')
-   ```
+## Next Steps
 
-   - Read `specs/jira-tickets/$TICKET_ID/technical-design.md`
-   - Fetch Jira ticket via MCP for acceptance criteria context
-   - Understand the architecture, components, and design decisions
+After completing the technical design:
 
-2. **COPY Tasks Template**
-
-   ```bash
-   cp specs/templates/tasks.template.md specs/jira-tickets/$TICKET_ID/tasks.md
-   ```
-
-3. **CREATE Atomic Task Breakdown**
-   For each component/phase in the technical design:
-   - Create TASK-### blocks with atomic checklist steps
-   - Each checklist item = single developer action (15-240 minutes)
-   - Include: description, acceptance criteria, implementation steps, files, tests
-
-   **Atomic Checklist Rules:**
-   - One action per line (create file, add field, run command, write test)
-   - No compound steps ("Create model and run migrations" → split into 2 steps)
-   - Include commit steps after logical units of work
-   - Test steps immediately follow implementation steps
-
-4. **MANDATORY: Devils Advocate Self-Critique**
-   Before presenting tasks, challenge your work:
-   - "Are there circular dependencies between tasks?"
-   - "Are estimates realistic or optimistic?"
-   - "What tasks are missing?"
-   - "Which tasks are high-risk and need extra attention?"
-   - "Can each task be completed independently once dependencies are met?"
-   - "Are acceptance criteria specific and testable?"
-   - "Did I include all necessary test tasks?"
-
-   **Document your critique and refinements made.**
-
-5. **REFINE tasks.md**
-   - Address concerns from Devils Advocate
-   - Add missing tasks identified
-   - Adjust estimates if needed
-   - Ensure proper dependency ordering
-
-6. **REQUEST APPROVAL (Single Gate)**
-   Present tasks.md to user:
-
-   ```markdown
-   ## Approval Request: Implementation Plan
-
-   I've created the implementation plan for ticket [TICKET-ID].
-
-   **Location**: `specs/jira-tickets/[TICKET-ID]/tasks.md`
-
-   **Summary**:
-
-   - Total tasks: [N]
-   - Estimated effort: [X hours/days]
-   - Phases: [List phases]
-
-   **Task Overview**:
-
-   1. TASK-001: [Title] - [Effort]
-   2. TASK-002: [Title] - [Effort]
-      ...
-
-   **Dependencies**: [Key dependencies]
-
-   **Risks Identified**:
-
-   - [Risk 1]: Mitigation: [Strategy]
-
-   **Devils Advocate Applied**: Yes - [Key concerns addressed]
-
-   Please review and approve to proceed to implementation.
-   ```
-
-   **Wait for approval before implementation agents begin work.**
-
-## Output Artifacts
-
-### 1. technical-design.md
-
-```markdown
----
-title: [Feature Name] - Technical Design
-date_created: [YYYY-MM-DD]
-status: draft | approved | implemented
-version: 1.0
-confidence: [0-100%]
----
-
-# [Feature Name] - Technical Design
-
-## Overview
-
-[High-level architecture description]
-
-## Technology Stack
-
-**Backend**:
-
-- Language/Framework: [Choice with rationale]
-- Database: [Choice with rationale]
-- Key Libraries: [List with purposes]
-
-**Frontend**:
-
-- Framework: [Choice with rationale]
-- State Management: [Choice with rationale]
-- Key Libraries: [List with purposes]
-
-**Testing**:
-
-- E2E: [Framework and approach]
-- Unit: [Framework and approach]
-
-## Architecture
-
-[Describe component interactions, data flow, and system architecture]
-```
-
-[Diagram or ASCII art if helpful]
-
-````
-
-## Data Models
-
-### Model 1: [Name]
-
-```typescript
-interface ModelName {
-  id: string;
-  field1: Type;
-  field2: Type;
-}
-````
-
-**Rationale**: [Why this structure]
-
-## API Contracts
-
-### Endpoint: POST /api/resource
-
-**Request**:
-
-```json
-{
-	"field": "value"
-}
-```
-
-**Response** (200 OK):
-
-```json
-{
-	"id": "123",
-	"field": "value"
-}
-```
-
-**Error Cases**:
-
-- 400: [Validation errors]
-- 404: [Not found]
-- 500: [Server error]
-
-## Component Design
-
-### Frontend Components
-
-- **ComponentName**: [Purpose and responsibilities]
-  - Props: [List]
-  - State: [List]
-  - Interactions: [How it communicates]
-
-### Backend Services
-
-- **ServiceName**: [Purpose and responsibilities]
-  - Methods: [List]
-  - Dependencies: [List]
-
-## Security Considerations
-
-- [Authentication approach]
-- [Authorization patterns]
-- [Data validation strategy]
-- [OWASP compliance]
-
-## Performance Considerations
-
-- [Caching strategy]
-- [Database optimization]
-- [Frontend optimization]
-- [Expected load and scaling plan]
-
-## Testing Strategy
-
-- **Unit Tests**: [What to test, coverage goals]
-- **Integration Tests**: [Key integration points]
-- **E2E Tests**: [Critical user flows]
-
-## Risks & Mitigations
-
-| Risk     | Impact       | Probability  | Mitigation |
-| -------- | ------------ | ------------ | ---------- |
-| [Risk 1] | High/Med/Low | High/Med/Low | [Strategy] |
-
-## Alternative Approaches Considered
-
-- **Approach 1**: [Why not chosen]
-- **Approach 2**: [Why not chosen]
-
-## Dependencies
-
-- External APIs: [List]
-- Third-party libraries: [List]
-- Infrastructure requirements: [List]
-
-## Open Questions
-
-- [ ] Question 1
-- [ ] Question 2
-
-````
-
-### 2. tasks.md
-
-```markdown
----
-title: [Feature Name] - Implementation Tasks
-date_created: [YYYY-MM-DD]
-status: not-started | in-progress | completed
-version: 1.0
-total_tasks: [X]
-total_estimate: [Y hours]
----
-
-# [Feature Name] - Implementation Tasks
-
-## Task Summary
-
-- **Total Tasks**: [X]
-- **Backend Tasks**: [X] ([Y] hours)
-- **Frontend Tasks**: [X] ([Y] hours)
-- **Testing Tasks**: [X] ([Y] hours)
-- **DevOps Tasks**: [X] ([Y] hours)
-
-## Dependencies Graph
-
-````
-
-TASK-001 → TASK-003 → TASK-007
-TASK-002 → TASK-004 → TASK-008
-TASK-005 → TASK-006 → TASK-009
-
-```
-
-## Backend Tasks
-
-### TASK-001: [Task Title]
-
-**Description**: [What needs to be done]
-
-**Files to modify**:
-- `backend/api/models.py` - [What to add/change]
-- `backend/api/views.py` - [What to add/change]
-
-**Implementation details**:
-1. Step 1
-2. Step 2
-3. Step 3
-
-**Acceptance criteria**:
-- [ ] Criterion 1
-- [ ] Criterion 2
-
-**Estimate**: [X hours]
-
-**Dependencies**: None | TASK-XXX
-
-**Risk**: Low | Medium | High - [Rationale]
-
----
-
-## Frontend Tasks
-
-### TASK-005: [Task Title]
-
-[Same structure as backend]
-
----
-
-## Testing Tasks
-
-### TASK-010: [Task Title]
-
-**Description**: Create E2E tests for [feature]
-
-**Test scenarios**:
-1. Happy path: [Description]
-2. Error case: [Description]
-3. Edge case: [Description]
-
-**Files to create/modify**:
-- `qa/tests/feature-name.spec.ts`
-
-**Estimate**: [X hours]
-
----
-
-## DevOps Tasks
-
-### TASK-015: [Task Title]
-
-[Configuration, deployment, CI/CD tasks]
-
----
-
-## Verification Checklist
-
-After all tasks complete:
-- [ ] All unit tests pass
-- [ ] All E2E tests pass
-- [ ] Code follows style guidelines
-- [ ] Documentation updated
-- [ ] Security review completed
-- [ ] Performance tested
-- [ ] All Jira ticket acceptance criteria verified
-```
+1. **Review** the technical-design.md document
+2. **Use the `create-tasks` prompt** to generate the implementation plan (tasks.md)
+3. **Approve** the implementation plan before starting development
 
 ## Best Practices
 
-- **Be Explicit**: Include exact file paths, function names, code structure
-- **Be Atomic**: Each task should be independently completable (one action per checklist item)
-- **Be Realistic**: Estimate conservatively, factor in testing time
-- **Be Clear**: Anyone should be able to pick up a task and execute it
-- **Reference Jira**: Link tasks to specific Jira ticket acceptance criteria
+- **Be Explicit**: Include exact architectural decisions with rationale
+- **Be Visual**: Use Mermaid diagrams for architecture and data flows
+- **Be Thorough**: Address security, performance, scalability from the start
+- **Be Critical**: Apply Devils Advocate rigorously to find flaws early
+- **Document Decisions**: Use ADRs for all significant architectural choices
 
 ## Reference
 
 - See `.github/instructions/spec-driven-workflow.instructions.md` for complete methodology
 - See `.github/agents/architect.agent.md` for Architect Agent details
-- See `.github/agents/tasks.agent.md` for Tasks Agent details
+- See `specs/templates/technical-design.template.md` for the full template
