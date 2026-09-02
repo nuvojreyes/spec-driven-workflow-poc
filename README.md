@@ -196,9 +196,9 @@ git push origin feature/PROJ-123-brief-description
 - Description: Links to Jira ticket, lists key changes
 - References: `specs/jira-tickets/PROJ-123/` artifacts
 
-**PR Review**:
+**Pre-PR Validation**:
 
-- Use `review-pr` prompt: `/review-pr` to get a checklist for reviewers
+- Run `/validate-before-pr` to check implementation completeness before opening the PR
 - Verifies against Jira acceptance criteria
 - Checks technical design compliance
 - Validates code quality standards
@@ -242,7 +242,7 @@ Located in `.github/prompts/`:
 - `design-solution.prompt.md` - Architect workflow
 - `create-tasks.prompt.md` - Tasks workflow from technical design
 - `devils-advocate.prompt.md` - Critical analysis
-- `review-pr.prompt.md` - PR review checklist
+- `validate-before-pr.prompt.md` - Pre-PR completeness and compliance check
 - `conventional-commit.prompt.md` - Generate commit message
 
 ## Quick Reference

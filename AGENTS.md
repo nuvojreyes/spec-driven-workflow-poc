@@ -142,7 +142,7 @@ Quick-start prompts in `.github/prompts/`:
 | `design-solution.prompt.md`     | Create technical design & tasks | Architect Agent workflow |
 | `create-tasks.prompt.md`        | Create implementation plan      | Tasks Agent workflow     |
 | `devils-advocate.prompt.md`     | Get critical analysis           | Devils Advocate agent    |
-| `review-pr.prompt.md`           | Review pull request             | PR review checklist      |
+| `validate-before-pr.prompt.md`  | Validate work before PR         | Pre-PR validation        |
 | `conventional-commit.prompt.md` | Generate commit message         | Git workflow             |
 
 ### How to Use Prompts
