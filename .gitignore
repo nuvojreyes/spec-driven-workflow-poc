@@ -1,0 +1,28 @@
+# OS
+.DS_Store
+Thumbs.db
+
+# Editors / IDE
+.vscode/
+.idea/
+*.swp
+*~
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Python (global fallback; see backend/.gitignore)
+__pycache__/
+*.pyc
+
+# Node (global fallback; see frontend/.gitignore, qa/.gitignore)
+node_modules/
+
+# Local agent tooling (not part of the project)
+.agents/
+skills-lock.json
