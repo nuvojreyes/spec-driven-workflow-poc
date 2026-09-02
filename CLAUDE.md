@@ -23,9 +23,8 @@ python backend/manage.py runserver          # :8000
 python backend/manage.py test
 
 # Frontend
-cd frontend && npm install && npm start     # :4200
-cd frontend && npm test
-cd frontend && npm run build
+cd frontend && npm install && npm start     # :4200, proxies /api to :8000
+cd frontend && npm run build                # also the typecheck
 
 # E2E (needs the backend running)
 cd qa && npm install && npx playwright install
@@ -45,6 +44,13 @@ docker-compose up --build
   `specs/jira-tickets/<TICKET-ID>/`.
 - Do not commit generated output, virtualenvs, or `db.sqlite3` — the root
   `.gitignore` covers them.
+- There is no frontend test or lint target yet: `angular.json` defines
+  neither and the dependencies are absent. `npm run build` is the
+  verification command. Do not add a `test` script without also adding the
+  target and the runner.
+- The frontend reaches the API at the same-origin path `/api`, through the
+  dev-server proxy in `frontend/proxy.conf.json`. Nothing hardcodes a host,
+  and the backend needs no CORS handling.
 
 ## Frontend state handling
 
@@ -53,6 +59,22 @@ doctrine imported below: all canonical states (`idle`, `loading`,
 `refreshing`, `error`, `empty`, `success`) handled explicitly, one state
 value driving the UI, and async logic plus state presentation reused from
 shared primitives rather than reinvented per feature.
+
+The primitives already exist. Reuse them; do not write a second set.
+
+| What | Where |
+| :--- | :--- |
+| State model and exhaustiveness guard | `frontend/src/app/core/async-state.ts` |
+| The async primitive | `frontend/src/app/core/to-async-state.ts` |
+| Error normalization | `frontend/src/app/core/http-error.ts` |
+| Loading / error / empty presentation | `frontend/src/app/shared/` |
+| Data layer | `frontend/src/app/weather/weather.service.ts` |
+| Reference block to follow | `frontend/src/app/app.component.ts` |
+
+Two backend levers reach every state from the browser with no code change,
+forwarded from the page URL to the API: `?delay=<seconds>` holds the
+response and `?fail=1` returns 503. An unknown city returns 404, and the
+city `nowhere` returns a successful response with an empty forecast.
 
 @.claude/rules/network-state-ui.md
 

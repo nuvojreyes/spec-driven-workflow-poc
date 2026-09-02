@@ -63,16 +63,40 @@ this file replaces them for PoC purposes.
 
 ## Trying it
 
-Restart Claude Code (assets are discovered at session start), then:
+Restart Claude Code (assets are discovered at session start), then run the
+backend and the frontend:
+
+```bash
+python backend/manage.py runserver            # :8000
+cd frontend && npm start                      # :4200, proxies /api
+```
+
+The featured-cities block in `frontend/src/app/app.component.ts` is the
+reference implementation of the doctrine: one `AsyncState` value, every
+canonical state rendered through the shared components in
+`frontend/src/app/shared/`, and no local loading or error flags. It is the
+pattern a new block is expected to converge on.
+
+The five-day forecast is deliberately unbuilt. `GET /api/forecast/<slug>/`
+is live and typed in `weather.model.ts`, WEATHER-007 sits in
+`specs/BACKLOG.md`, and no UI consumes it — so the subagent has to
+inventory what exists and reuse it:
 
 ```
-Use the network-state-ui agent to wire the featured-city panel to the backend.
+Use the network-state-ui agent to add a five-day forecast block to the
+dashboard for the selected city.
 ```
 
-The frontend currently hardcodes its city data in
-`frontend/src/app/app.component.ts` with no HTTP layer at all — every
-canonical state (`idle`, `loading`, `refreshing`, `error`, `empty`,
-`success`) is unhandled, which makes it a realistic target for the agent.
+Its `empty` state is reachable: the city `nowhere` returns a successful
+response with zero days. `?delay=<seconds>` and `?fail=1` on the page URL
+reach `loading`, `refreshing` and `error`.
+
+To see it audit rather than write, ask for a report first:
+
+```
+Use the network-state-ui agent to audit the featured-cities block and
+report which canonical states it handles. Report only, do not edit.
+```
 
 For the changelog skill:
 
