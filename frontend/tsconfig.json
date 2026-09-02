@@ -1,16 +1,27 @@
 {
-	"compileOnSave": false,
-	"compilerOptions": {
-		"baseUrl": "",
-		"outDir": "./dist/out-tsc",
-		"sourceMap": true,
-		"declaration": false,
-		"downlevelIteration": true,
-		"experimentalDecorators": true,
-		"moduleResolution": "node",
-		"importHelpers": true,
-		"target": "es2020",
-		"module": "es2020",
-		"lib": ["es2020", "dom"]
-	}
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "",
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "declaration": false,
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "target": "es2020",
+    "module": "es2020",
+    "lib": [
+      "es2020",
+      "dom"
+    ],
+    "strict": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "angularCompilerOptions": {
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true
+  }
 }
