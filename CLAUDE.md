@@ -38,6 +38,8 @@ docker-compose up --build
 ## Conventions
 
 - Commits follow Conventional Commits: `type(scope): description`.
+  Always written in English, whatever language the conversation uses.
+  No `Co-Authored-By` trailers.
 - Branch names carry the backlog ID: `feature/WEATHER-001-short-description`.
 - Backlog items live in `specs/BACKLOG.md`; per-ticket artifacts in
   `specs/jira-tickets/<TICKET-ID>/`.
