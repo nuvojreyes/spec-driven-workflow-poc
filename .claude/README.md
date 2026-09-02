@@ -23,31 +23,35 @@ All files here are copied **verbatim** (byte-for-byte) from:
 | `skills/implement-network-state-ui/REFERENCE.md` | same directory upstream | On demand, by the skill |
 | `skills/skill-changelog-updater/SKILL.md` | `.claude/skills/skill-changelog-updater/SKILL.md` | Yes — skill |
 | `skills/skill-changelog-updater/CHANGELOG.md` | same directory upstream | No — its own version history |
-| `rules/network-state-ui.md` | `agents/frontend/network-state-ui/rules/network-state-ui.md` | **No** — see below |
+| `rules/network-state-ui.md` | `agents/frontend/network-state-ui/rules/network-state-ui.md` | Yes — imported by the root `CLAUDE.md` |
 
 The upstream layout is a *library* layout (`agents/<guild>/<agent>/`, with
 `claude-agents/` meaning "install these into `.claude/agents/`"). Here the
 files sit where Claude Code actually reads them, so the assets run rather
 than just being stored.
 
-## Known gaps in this PoC
+## Deviations from upstream
 
-1. **`rules/network-state-ui.md` is inert.** Claude Code has no
-   `.claude/rules/` convention — it reads project rules from `CLAUDE.md`.
-   The file is kept for reference and for the Antigravity variant of these
-   assets. To make its laws binding here, reference or inline it from a
-   root `CLAUDE.md`. Note the subagent in `agents/network-state-ui.md` is
-   self-contained and already carries the same doctrine inline, so the
-   subagent path works without it.
-2. **`skills/implement-network-state-ui/SKILL.md` points at
-   `rules/network-state-ui.md`** relative to its own directory, which
-   resolves to nothing here (the file is one level up, under
-   `.claude/rules/`). Left unedited to keep these files byte-identical to
-   upstream.
-3. **`skills/skill-changelog-updater/SKILL.md` is truncated upstream.** It
+Two upstream gaps were patched to make the assets work in this layout.
+Everything else is byte-identical to the source commit.
+
+1. **`rules/network-state-ui.md` is now binding.** Claude Code has no
+   `.claude/rules/` convention of its own — it reads project rules from
+   `CLAUDE.md`. The root `CLAUDE.md` therefore imports the file with
+   `@.claude/rules/network-state-ui.md`, so its laws load into every
+   session. The file itself is untouched.
+2. **`skills/implement-network-state-ui/SKILL.md` line 13 was repointed.**
+   Upstream it reads ``Apply the laws in `rules/network-state-ui.md``` —
+   a path relative to the agent directory in the library repo, which
+   resolves to nothing here. It now points at
+   `.claude/rules/network-state-ui.md`. This is the only edited line in
+   any copied file.
+3. **`skills/skill-changelog-updater/SKILL.md` was completed.** Upstream it
    ends mid-procedure at step 5 ("Write the changelog entry") with no
-   output format, template, or examples. Copied as-is; the gap is in the
-   source, not in the copy.
+   output format, template, or examples, which makes the skill unusable as
+   shipped. The missing sections were written and the skill bumped to
+   1.1.0 per its own versioning rules; see its `CHANGELOG.md`. Worth
+   pushing back upstream.
 
 ## Assets not brought over
 

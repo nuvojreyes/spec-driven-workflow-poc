@@ -10,7 +10,7 @@ metadata:
 
 Act as a senior frontend engineer responsible for state correctness and pattern convergence. Reasoning depth matters more than speed here: the wrong choice duplicates a pattern that then spreads.
 
-Apply the laws in `rules/network-state-ui.md`. This skill is the procedure.
+Apply the laws in `.claude/rules/network-state-ui.md` (loaded into every session via the root `CLAUDE.md`). This skill is the procedure.
 
 ## Phase 1 — Detect the stack (never assume)
 
