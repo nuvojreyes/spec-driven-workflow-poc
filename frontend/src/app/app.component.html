@@ -1,4 +1,119 @@
-<div style="padding:16px">
-	<h1>{{ title }}</h1>
-	<p>Angular frontend scaffold. API available at <code>/api/</code> (see backend).</p>
-</div>
+<main class="home-shell">
+	<section class="hero" [ngStyle]="heroBackdropStyle">
+		<div class="hero-copy">
+			<p class="eyebrow">Weather command center</p>
+			<h1>Forecasts that feel calm, clear, and alive.</h1>
+			<p class="lede">
+				Track today, plan tomorrow, and read shifting skies in a polished blue-first
+				experience built for focus.
+			</p>
+
+			<div class="hero-actions">
+				<button type="button" class="primary-action">Explore forecast</button>
+				<button type="button" class="secondary-action">View radar</button>
+			</div>
+
+			<div class="hero-chips" aria-label="Highlights">
+				<span>Live updates</span>
+				<span>Hourly view</span>
+				<span>Storm alerts</span>
+			</div>
+		</div>
+
+			<div class="hero-visual">
+			<div class="sky-orb sky-orb-large"></div>
+			<div class="sky-orb sky-orb-medium"></div>
+			<div class="sky-panel">
+				<div class="sky-panel__top">
+					<div>
+						<p>{{ activeCity.name }}</p>
+						<p>{{ activeCity.country }}</p>
+						<h2>{{ activeCity.temperature }}</h2>
+					</div>
+						<div class="sky-status">{{ activeCity.status }}</div>
+					</div>
+					<div class="sky-panel__bottom">
+						<div>
+							<strong>Feels like</strong>
+							<span>{{ activeCity.feelsLike }}</span>
+						</div>
+						<div>
+							<strong>Wind</strong>
+							<span>{{ activeCity.wind }}</span>
+						</div>
+						<div>
+							<strong>Humidity</strong>
+							<span>{{ activeCity.humidity }}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+	</section>
+
+	<section class="cities" aria-label="Featured cities">
+		<div class="section-heading">
+			<p class="eyebrow">Cities</p>
+			<h2>Compare weather at a glance.</h2>
+			<p>Switch between bright coastlines and warmer inland conditions without leaving the home screen.</p>
+		</div>
+
+			<div class="city-grid">
+			<button
+				type="button"
+				class="city-card"
+				*ngFor="let city of featuredCities"
+				[class.city-card--active]="city === activeCity"
+				(click)="selectCity(city)"
+				[attr.aria-pressed]="city === activeCity"
+			>
+				<div class="city-card__top">
+					<div>
+						<p class="city-name">{{ city.name }}</p>
+						<p class="city-country">{{ city.country }}</p>
+						<h3>{{ city.temperature }}</h3>
+					</div>
+					<span class="city-status">{{ city.status }}</span>
+				</div>
+
+				<div class="city-summary">
+					<span>High {{ city.high }}</span>
+					<span>Low {{ city.low }}</span>
+					<span>Rain {{ city.coverage }}</span>
+				</div>
+
+				<div class="city-metrics">
+					<div>
+						<strong>Feels like</strong>
+						<span>{{ city.feelsLike }}</span>
+					</div>
+					<div>
+						<strong>Wind</strong>
+						<span>{{ city.wind }}</span>
+					</div>
+					<div>
+						<strong>Humidity</strong>
+						<span>{{ city.humidity }}</span>
+					</div>
+				</div>
+			</button>
+		</div>
+	</section>
+
+	<section class="insights">
+		<article class="insight-card">
+			<p class="card-label">Now</p>
+			<h3>Bright blue skies</h3>
+			<p>Clear conditions with soft coastal haze and steady visibility.</p>
+		</article>
+		<article class="insight-card">
+			<p class="card-label">Today</p>
+			<h3>Gentle warming</h3>
+			<p>Temperatures rise through the afternoon with light ocean breeze.</p>
+		</article>
+		<article class="insight-card">
+			<p class="card-label">Tonight</p>
+			<h3>Cool reset</h3>
+			<p>Clean evening drop with crisp air and low cloud cover near dawn.</p>
+		</article>
+	</section>
+</main>
