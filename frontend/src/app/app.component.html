@@ -1,5 +1,12 @@
-<main class="home-shell">
-	<section class="hero" [ngStyle]="heroBackdropStyle">
+<main class="home-shell" *ngIf="state$ | async as state">
+	<!-- One announcement for the whole block; the skeleton shapes stay aria-hidden. -->
+	<p class="visually-hidden" role="status" aria-live="polite">{{ announce(state) }}</p>
+
+	<section
+		class="hero"
+		[ngStyle]="heroBackdrop(state)"
+		[attr.aria-busy]="pending(state)"
+	>
 		<div class="hero-copy">
 			<p class="eyebrow">Weather command center</p>
 			<h1>Forecasts that feel calm, clear, and alive.</h1>
@@ -10,7 +17,18 @@
 
 			<div class="hero-actions">
 				<button type="button" class="primary-action">Explore forecast</button>
-				<button type="button" class="secondary-action">View radar</button>
+				<button
+					type="button"
+					class="secondary-action"
+					(click)="refresh()"
+					[disabled]="pending(state)"
+					[attr.aria-describedby]="pending(state) ? 'refresh-pending' : null"
+				>
+					{{ state.status === 'refreshing' ? 'Refreshing…' : 'Refresh readings' }}
+				</button>
+				<span id="refresh-pending" class="visually-hidden">
+					Disabled while the current request is in flight.
+				</span>
 			</div>
 
 			<div class="hero-chips" aria-label="Highlights">
@@ -20,34 +38,75 @@
 			</div>
 		</div>
 
-			<div class="hero-visual">
+		<div class="hero-visual">
 			<div class="sky-orb sky-orb-large"></div>
 			<div class="sky-orb sky-orb-medium"></div>
-			<div class="sky-panel">
-				<div class="sky-panel__top">
-					<div>
-						<p>{{ activeCity.name }}</p>
-						<p>{{ activeCity.country }}</p>
-						<h2>{{ activeCity.temperature }}</h2>
-					</div>
-						<div class="sky-status">{{ activeCity.status }}</div>
+
+			<div class="sky-panel" [ngSwitch]="state.status">
+				<!-- idle: unreachable here, the request fires on subscribe. Handled
+				     anyway, and deliberately not a spinner. -->
+				<p *ngSwitchCase="'idle'" class="sky-idle">Pick a city to see its conditions.</p>
+
+				<app-skeleton *ngSwitchCase="'loading'" [heading]="true" [lines]="4"></app-skeleton>
+
+				<app-error-state
+					*ngSwitchCase="'error'"
+					[error]="state.error"
+					title="Conditions unavailable"
+					(retry)="retry()"
+				></app-error-state>
+
+				<app-empty-state
+					*ngSwitchCase="'empty'"
+					title="No cities configured"
+					message="The weather service answered, but it has no cities on file yet."
+					actionLabel="Check again"
+					(action)="retry()"
+				></app-empty-state>
+
+				<ng-container *ngSwitchCase="'refreshing'">
+					<ng-container *ngTemplateOutlet="skyPanel"></ng-container>
+				</ng-container>
+
+				<ng-container *ngSwitchCase="'success'">
+					<ng-container *ngTemplateOutlet="skyPanel"></ng-container>
+				</ng-container>
+			</div>
+
+			<!-- Shared by `success` and `refreshing`: the same content, the second
+			     time with a non-blocking indicator rather than a replacement. -->
+			<ng-template #skyPanel>
+				<ng-container *ngIf="conditionsOf(state) as current">
+					<div class="sky-panel__top">
+						<div>
+							<p>{{ current.city }}</p>
+							<p>{{ current.country }}</p>
+							<h2>{{ degrees(current.temperatureF) }}</h2>
+						</div>
+						<div class="sky-status">{{ current.status }}</div>
 					</div>
 					<div class="sky-panel__bottom">
 						<div>
 							<strong>Feels like</strong>
-							<span>{{ activeCity.feelsLike }}</span>
+							<span>{{ degrees(current.feelsLikeF) }}</span>
 						</div>
 						<div>
 							<strong>Wind</strong>
-							<span>{{ activeCity.wind }}</span>
+							<span>{{ wind(current.windMph) }}</span>
 						</div>
 						<div>
 							<strong>Humidity</strong>
-							<span>{{ activeCity.humidity }}</span>
+							<span>{{ percent(current.humidityPct) }}</span>
 						</div>
 					</div>
-				</div>
-			</div>
+					<div
+						*ngIf="state.status === 'refreshing'"
+						class="refreshing-bar"
+						aria-hidden="true"
+					></div>
+				</ng-container>
+			</ng-template>
+		</div>
 	</section>
 
 	<section class="cities" aria-label="Featured cities">
@@ -57,46 +116,81 @@
 			<p>Switch between bright coastlines and warmer inland conditions without leaving the home screen.</p>
 		</div>
 
-			<div class="city-grid">
+		<div class="city-grid" [ngSwitch]="state.status">
+			<p *ngSwitchCase="'idle'" class="sky-idle">Nothing requested yet.</p>
+
+			<!-- Placeholders occupy the loaded footprint: same card count, same
+			     card chrome, so nothing shifts when data arrives. -->
+			<ng-container *ngSwitchCase="'loading'">
+				<div class="city-card city-card--placeholder" *ngFor="let card of skeletonCards">
+					<app-skeleton [heading]="true" [lines]="4"></app-skeleton>
+				</div>
+			</ng-container>
+
+			<app-error-state
+				*ngSwitchCase="'error'"
+				[error]="state.error"
+				title="Cities unavailable"
+				(retry)="retry()"
+			></app-error-state>
+
+			<app-empty-state
+				*ngSwitchCase="'empty'"
+				title="No cities to compare"
+				message="Add a city to the weather service and it will appear here."
+				actionLabel="Check again"
+				(action)="retry()"
+			></app-empty-state>
+
+			<ng-container *ngSwitchCase="'refreshing'">
+				<ng-container *ngTemplateOutlet="cityCards; context: { data: state.data }"></ng-container>
+			</ng-container>
+
+			<ng-container *ngSwitchCase="'success'">
+				<ng-container *ngTemplateOutlet="cityCards; context: { data: state.data }"></ng-container>
+			</ng-container>
+		</div>
+
+		<ng-template #cityCards let-data="data">
 			<button
 				type="button"
 				class="city-card"
-				*ngFor="let city of featuredCities"
-				[class.city-card--active]="city === activeCity"
-				(click)="selectCity(city)"
-				[attr.aria-pressed]="city === activeCity"
+				*ngFor="let entry of data; trackBy: trackBySlug"
+				[class.city-card--active]="entry.slug === activeSlug"
+				(click)="select(entry.slug)"
+				[attr.aria-pressed]="entry.slug === activeSlug"
 			>
 				<div class="city-card__top">
 					<div>
-						<p class="city-name">{{ city.name }}</p>
-						<p class="city-country">{{ city.country }}</p>
-						<h3>{{ city.temperature }}</h3>
+						<p class="city-name">{{ entry.current.city }}</p>
+						<p class="city-country">{{ entry.current.country }}</p>
+						<h3>{{ degrees(entry.current.temperatureF) }}</h3>
 					</div>
-					<span class="city-status">{{ city.status }}</span>
+					<span class="city-status">{{ entry.current.status }}</span>
 				</div>
 
 				<div class="city-summary">
-					<span>High {{ city.high }}</span>
-					<span>Low {{ city.low }}</span>
-					<span>Rain {{ city.coverage }}</span>
+					<span>High {{ degrees(entry.current.highF) }}</span>
+					<span>Low {{ degrees(entry.current.lowF) }}</span>
+					<span>Rain {{ percent(entry.current.cloudCoveragePct) }}</span>
 				</div>
 
 				<div class="city-metrics">
 					<div>
 						<strong>Feels like</strong>
-						<span>{{ city.feelsLike }}</span>
+						<span>{{ degrees(entry.current.feelsLikeF) }}</span>
 					</div>
 					<div>
 						<strong>Wind</strong>
-						<span>{{ city.wind }}</span>
+						<span>{{ wind(entry.current.windMph) }}</span>
 					</div>
 					<div>
 						<strong>Humidity</strong>
-						<span>{{ city.humidity }}</span>
+						<span>{{ percent(entry.current.humidityPct) }}</span>
 					</div>
 				</div>
 			</button>
-		</div>
+		</ng-template>
 	</section>
 
 	<section class="insights">

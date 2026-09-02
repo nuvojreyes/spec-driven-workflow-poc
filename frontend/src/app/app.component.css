@@ -456,3 +456,81 @@
 		grid-template-columns: 1fr;
 	}
 }
+
+/* --- Network state presentation ------------------------------------------
+   Added with the AsyncState refactor. The state components carry their own
+   styles; what lives here is only what belongs to this block's layout. */
+
+/* Announcement target for assistive technology. Visible to screen readers,
+   never to the eye — do not replace with display:none, which removes it from
+   the accessibility tree too. */
+.visually-hidden {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	clip-path: inset(50%);
+	white-space: nowrap;
+	border: 0;
+}
+
+/* `idle`: a neutral prompt, never a spinner. Nothing has been requested. */
+.sky-idle {
+	margin: 0;
+	color: rgba(220, 233, 255, 0.72);
+	font-weight: 600;
+}
+
+/* `refreshing`: data stays on screen and this stays non-blocking. */
+.refreshing-bar {
+	position: relative;
+	height: 3px;
+	margin-top: 0.9rem;
+	overflow: hidden;
+	border-radius: 999px;
+	background: rgba(148, 197, 255, 0.16);
+}
+
+.refreshing-bar::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	width: 40%;
+	border-radius: 999px;
+	background: #94c5ff;
+	animation: refreshing-slide 1.1s ease-in-out infinite;
+}
+
+@keyframes refreshing-slide {
+	0% {
+		transform: translateX(-100%);
+	}
+	100% {
+		transform: translateX(250%);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.refreshing-bar::after {
+		animation: none;
+		width: 100%;
+		opacity: 0.6;
+	}
+}
+
+/* `loading`: same chrome and same footprint as a real card, so the grid does
+   not reflow when data lands. */
+.city-card--placeholder {
+	cursor: default;
+	pointer-events: none;
+}
+
+/* A pending mutation or request must explain itself rather than just going
+   inert; the label changes and aria-describedby says why. */
+.secondary-action:disabled {
+	opacity: 0.55;
+	cursor: progress;
+}
