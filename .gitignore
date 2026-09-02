@@ -1,28 +1,118 @@
-# OS
+# ---------------------------------------------------------------------------
+# Root .gitignore
+#
+# Repo-wide rules. Sub-projects keep their own .gitignore for anything
+# specific to them (backend/, frontend/, qa/, specs/).
+# ---------------------------------------------------------------------------
+
+# --- Operating system ------------------------------------------------------
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
 Thumbs.db
+Desktop.ini
 
-# Editors / IDE
+# --- Editors / IDE ---------------------------------------------------------
 .vscode/
+!.vscode/extensions.json
 .idea/
+*.iml
 *.swp
+*.swo
 *~
+.history/
 
-# Environment / secrets
+# --- Environment / secrets -------------------------------------------------
+# Never commit real credentials. Ship a committed .env.example instead.
 .env
 .env.*
 !.env.example
+*.pem
+*.key
+*.p12
+*.keystore
+secrets.json
+credentials.json
 
-# Logs
+# --- Logs / temp -----------------------------------------------------------
 *.log
+logs/
+*.pid
+*.seed
+*.tmp
+*.bak
+*.orig
+*.rej
 
-# Python (global fallback; see backend/.gitignore)
+# --- Python / Django (see also backend/.gitignore) -------------------------
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+env/
+ENV/
+*.egg-info/
+.eggs/
+build/
+develop-eggs/
+pip-wheel-metadata/
+.installed.cfg
 
-# Node (global fallback; see frontend/.gitignore, qa/.gitignore)
+# Test / lint / type-check caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.nox/
+.coverage
+.coverage.*
+coverage.xml
+htmlcov/
+
+# Django runtime artifacts
+*.sqlite3
+*.sqlite3-journal
+db.sqlite3
+media/
+staticfiles/
+local_settings.py
+
+# --- Node / Angular (see also frontend/.gitignore, qa/.gitignore) ----------
 node_modules/
+jspm_packages/
+dist/
+tmp/
+out-tsc/
+.angular/
+.npm
+.yarn/cache
+.yarn/install-state.gz
+.pnpm-store/
+npm-debug.log*
+yarn-error.log*
+yarn-debug.log*
+pnpm-debug.log*
+*.tsbuildinfo
+.eslintcache
 
-# Local agent tooling (not part of the project)
+# --- Playwright / E2E (see also qa/.gitignore) -----------------------------
+test-results/
+playwright-report/
+playwright/.cache/
+blob-report/
+.playwright/
+trace/
+
+# --- Docker ----------------------------------------------------------------
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# --- Local agent / AI tooling (developer setup, not project code) ----------
 .agents/
 skills-lock.json
+.claude/settings.local.json
