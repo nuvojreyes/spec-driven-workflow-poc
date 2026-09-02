@@ -7,7 +7,8 @@ export default defineConfig({
 		timeout: 5000,
 	},
 	use: {
-		baseURL: 'http://127.0.0.1:8000',
+		// Inside docker compose the backend is a service name, not localhost.
+		baseURL: process.env['PLAYWRIGHT_BASE_URL'] ?? 'http://127.0.0.1:8000',
 		headless: true,
 		viewport: { width: 1280, height: 720 },
 		actionTimeout: 10000,

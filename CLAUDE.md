@@ -17,21 +17,25 @@ Monorepo for a weather application, used as a testbed for AI agent assets.
 ## Commands
 
 ```bash
-# Backend
-python backend/manage.py migrate
-python backend/manage.py runserver          # :8000
-python backend/manage.py test
+# Both services, on the host. Ctrl-C stops both.
+./dev.sh
+BACKEND_PORT=8001 FRONTEND_PORT=4201 ./dev.sh   # when a port is taken
 
-# Frontend
-cd frontend && npm install && npm start     # :4200, proxies /api to :8000
-cd frontend && npm run build                # also the typecheck
+# Both services, in containers
+docker compose up --build
+BACKEND_PORT=8001 FRONTEND_PORT=4201 docker compose up --build
 
-# E2E (needs the backend running)
-cd qa && npm install && npx playwright install
-cd qa && npm test
+# Separately
+python backend/manage.py runserver 127.0.0.1:8000
+cd frontend && npm start                        # :4200, proxies /api
 
-# Everything
-docker-compose up --build
+# Verification (there is no frontend test target — see Conventions)
+cd frontend && npm run build
+python backend/manage.py check
+
+# E2E, against a running backend
+cd qa && npm install && npx playwright install && npm test
+docker compose run --rm qa                      # same suite, in a container
 ```
 
 ## Conventions

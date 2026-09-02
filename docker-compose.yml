@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     build:
@@ -8,30 +6,51 @@ services:
     volumes:
       - ./backend:/app
     ports:
-      - "8000:8000"
+      # Host port is overridable; inside the network the backend always
+      # listens on 8000, which is what API_TARGET below points at.
+      - "${BACKEND_PORT:-8000}:8000"
     environment:
       - PYTHONUNBUFFERED=1
     command: >
-      sh -c "pip install -r requirements.txt && python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
+      sh -c "python manage.py migrate --noinput && python manage.py runserver 0.0.0.0:8000"
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    depends_on:
+      - backend
     volumes:
       - ./frontend:/app
+      # Anonymous volume, so the container keeps the node_modules built for
+      # Linux inside the image. Without it the bind mount above would share
+      # the host's node_modules, whose native binaries (esbuild) are built
+      # for the host platform and fail in the container — and a reinstall
+      # inside the container would then break the host in the same way.
+      - /app/node_modules
     ports:
-      - "4200:4200"
+      - "${FRONTEND_PORT:-4200}:4200"
+    environment:
+      # 127.0.0.1 inside this container is the container itself; the backend
+      # is reachable by service name. See frontend/proxy.conf.js.
+      - API_TARGET=http://backend:8000
     command: >
-      sh -c "npm install && npx ng serve --host 0.0.0.0 --port 4200"
+      sh -c "npx ng serve --host 0.0.0.0 --port 4200"
 
   qa:
     build:
       context: ./qa
       dockerfile: Dockerfile
+    # Excluded from `docker compose up`: this service runs a test suite and
+    # exits, so it has no place in the long-running stack.
+    profiles: ["qa"]
     depends_on:
       - backend
+    environment:
+      # Inside the network the backend is a service name, not localhost.
+      - PLAYWRIGHT_BASE_URL=http://backend:8000
     volumes:
       - ./qa:/app
+      - /app/node_modules
     entrypoint: ["npx", "playwright", "test"]
-    # Run with: docker-compose run --rm qa
+    # Run with: docker compose run --rm qa
